@@ -1,0 +1,25 @@
+[workspace.package]
+description = "todo"
+version = "0.1.0"
+license = "Apache-2.0 OR MIT"
+authors = ["Brian Anderson <andersrb@gmail.com>"]
+documentation = "todo"
+edition = "2021"
+
+[workspace]
+resolver = "2"
+
+members = [
+  "crates/*",
+]
+
+default-members = [
+  "crates/audiotool-cli",
+]
+
+[workspace.dependencies]
+rx.path = "../rustx/crates/rustx"
+rx.package = "rustx"
+rx.features = [
+  "rx-profile-std",
+]

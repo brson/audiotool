@@ -1,0 +1,11 @@
+[package]
+name = "audiotool"
+version.workspace = true
+license.workspace = true
+authors.workspace = true
+edition.workspace = true
+
+[dependencies]
+rx.workspace = true
+rx.features = [
+]
