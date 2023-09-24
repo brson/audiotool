@@ -1,0 +1,40 @@
+# Encodings
+
+maybe just use libavcodec / libavformat
+
+- FLAC
+  - lib: xiph/flac
+  - containers: flac
+  - meta: ogg comments
+- ALAC
+  - lib: macosforge/alac
+- Vorbis
+  - lib: xiph/vorbis
+  - containers: ogg
+  - meta: ogg comments
+- MP3
+  - lib: libmp3lame / libavcodec
+  - container: mp3
+  - meta: id3
+- AAC
+  - lib: libavcodec
+
+# Containers
+
+- FLAC
+  - lib: xiph/flac
+- MP4 (M4A)
+- Ogg
+  - lib: xiph/ogg
+- MP3
+  - lib: lame
+
+# Metadata
+
+- FLAC / Ogg
+- ID3
+
+# Other tools
+
+- Sample rate conversion (libsrc)
+- Dithering (?)
