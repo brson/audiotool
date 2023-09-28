@@ -22,4 +22,6 @@ rx.path = "../rustx/crates/rustx"
 rx.package = "rustx"
 rx.features = [
   "rx-profile-std",
+  "rx-profile-cli",
+  "rx-feature-derive",
 ]

@@ -2,6 +2,9 @@ use rx::prelude::*;
 use rx::clap::{self, Parser as _};
 use std::path::PathBuf;
 
+mod convert;
+mod split;
+
 fn main() -> AnyResult<()> {
     rx::extras::init();
 
