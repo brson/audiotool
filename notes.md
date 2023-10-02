@@ -38,3 +38,9 @@ maybe just use libavcodec / libavformat
 
 - Sample rate conversion (libsrc)
 - Dithering (?)
+
+# Dithering
+
+- triangular probability density function (tpdf)
+- airwindows
+- https://gearspace.com/gear/airwindows/tpdf?via=gear_post_link
