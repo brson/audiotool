@@ -43,4 +43,5 @@ maybe just use libavcodec / libavformat
 
 - triangular probability density function (tpdf)
 - airwindows
+- https://gearspace.com/board/showpost.php?p=12360487&postcount=14
 - https://gearspace.com/gear/airwindows/tpdf?via=gear_post_link
