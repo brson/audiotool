@@ -6,6 +6,7 @@ authors.workspace = true
 edition.workspace = true
 
 [dependencies]
+audiotool.path = "../audiotool"
 rx.workspace = true
 rx.features = [
   "rx-profile-cli",

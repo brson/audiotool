@@ -2,6 +2,8 @@
 
 maybe just use libavcodec / libavformat
 
+- WAV
+  - crate: hound
 - FLAC
   - lib: xiph/flac
   - containers: flac
@@ -26,6 +28,7 @@ maybe just use libavcodec / libavformat
 - MP4 (M4A)
 - Ogg
   - lib: xiph/ogg
+  - crate: rustaudio/ogg
 - MP3
   - lib: lame
 
