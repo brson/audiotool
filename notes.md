@@ -10,6 +10,7 @@ maybe just use libavcodec / libavformat
   - meta: ogg comments
 - ALAC
   - lib: macosforge/alac
+  - container: m4a
 - Vorbis
   - lib: xiph/vorbis
   - containers: ogg
@@ -20,6 +21,8 @@ maybe just use libavcodec / libavformat
   - meta: id3
 - AAC
   - lib: libavcodec
+    - with libfdk_aac
+  - container: m4a
 
 # Containers
 
@@ -36,6 +39,7 @@ maybe just use libavcodec / libavformat
 
 - FLAC / Ogg
 - ID3
+- mp4
 
 # Other tools
 
