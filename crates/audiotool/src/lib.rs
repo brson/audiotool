@@ -6,22 +6,32 @@ pub mod split;
 pub mod traits {
     use rx::prelude::*;
 
-    pub trait PcmReader {
+    pub trait PcmReader<S> where S: SampleFormat {
         fn props(&mut self) -> AnyResult<FileProps>;
 
         fn read(
             &mut self,
-            buf: &mut Buf,
+            buf: &mut Vec<S::Type>,
         ) -> AnyResult<()>;
     }
 
-    pub trait PcmWriter {
+    pub trait PcmWriter<S> where S: SampleFormat {
         fn props(&self) -> AnyResult<FileProps>;
 
         fn write(
             &mut self,
-            buf: &Buf,
+            buf: &Vec<S::Type>,
         ) -> AnyResult<()>;
+    }
+
+    pub trait SampleFormat {
+        type Type;
+    }
+
+    pub struct F32;
+
+    impl SampleFormat for F32 {
+        type Type = f32;
     }
 
     pub enum Buf {
@@ -54,10 +64,10 @@ pub mod traits {
         K48,
     }
 
-    fn static_assertions(
-        reader: &dyn PcmReader,
-        writer: &dyn PcmWriter,
-    ) { }
+    fn static_assertions<S>(
+        reader: &dyn PcmReader<S>,
+        writer: &dyn PcmWriter<S>,
+    ) where S: SampleFormat { }
 }
 
 pub mod codecs {
