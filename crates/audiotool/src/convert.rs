@@ -32,7 +32,7 @@ pub use config::*;
 use rx::prelude::*;
 use rx::rayon::prelude::*;
 
-use rx::walkdir::WalkDir;
+use rx::walkdir::{self, WalkDir, DirEntry};
 use std::sync::mpsc::{SyncSender, Receiver, sync_channel};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
@@ -75,34 +75,49 @@ fn run(
     let cancel = Arc::new(AtomicBool::from(false));
 
     let join_handle = {
+        let tx = tx.clone();
         let cancel = cancel.clone();
         thread::spawn(move || {
             WalkDir::new(&config.reference_tracks_dir)
                 .into_iter()
                 .par_bridge()
                 .try_for_each(|entry| {
-                    if cancel.load(Ordering::SeqCst) {
-                        return None;
-                    }
+                    let keep_going = convert_entry(
+                        &config, &entry, &tx, &cancel,
+                    );
 
-                    todo!();
-
-                    return Some(());
+                    return keep_going;
                 });
         })
     };
 
-    for req in rx.iter() {
-        match req {
-            Request::Cancel => {
-                cancel.store(true, Ordering::SeqCst);
-                join_handle.join().expect("join");
-                break;
+    thread::spawn(move || {
+        for req in rx.iter() {
+            match req {
+                Request::Cancel => {
+                    cancel.store(true, Ordering::SeqCst);
+                    break;
+                }
             }
         }
-    }
+    });
+
+    join_handle.join().expect("join");
 
     let _ = tx.send(Response::Done);
+}
+
+fn convert_entry(
+    config: &Config,
+    entry: &Result<DirEntry, walkdir::Error>,
+    tx: &SyncSender<Response>,
+    cancel: &AtomicBool,
+) -> Option<()> {
+    if cancel.load(Ordering::SeqCst) {
+        return None;
+    }
+
+    todo!()
 }
 
 fn convert_file(
