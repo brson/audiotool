@@ -27,5 +27,38 @@ mod config {
     }
 }
 
-mod plan {
+pub use config::*;
+
+use rx::prelude::*;
+use std::sync::mpsc::{SyncSender, Receiver, sync_channel};
+use std::thread;
+use std::path::PathBuf;
+
+pub enum Msg {
+    GetNextResult,
+    Cancel,
+    Done,
+}
+
+pub enum Response {
+    NextResult(AnyResult<ConvertResult>),
+    Done,
+}
+
+pub struct ConvertResult {
+    pub in_path: PathBuf,
+    pub out_path: PathBuf,
+}
+
+pub fn run(config: Config) -> (
+    SyncSender<Msg>,
+    Receiver<Response>,
+) {
+    let (in_tx, in_rx) = sync_channel(2);
+    let (out_tx, out_rx) = sync_channel(2);
+
+    thread::spawn(|| {
+    });
+
+    (in_tx, out_rx)
 }
