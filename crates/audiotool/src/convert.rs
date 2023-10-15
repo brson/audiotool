@@ -30,7 +30,7 @@ mod config {
 pub use config::*;
 
 use rx::prelude::*;
-use rx::rayon::prelude::*;
+use rx::rayon::{self, prelude::*};
 
 use rx::walkdir::{self, WalkDir, DirEntry};
 use std::sync::mpsc::{SyncSender, Receiver, sync_channel};
@@ -57,8 +57,8 @@ pub fn spawn(config: Config) -> (
     SyncSender<Request>,
     Receiver<Response>,
 ) {
-    let (in_tx, in_rx) = sync_channel(2);
-    let (out_tx, out_rx) = sync_channel(2);
+    let (in_tx, in_rx) = sync_channel(1);
+    let (out_tx, out_rx) = sync_channel(1);
 
     thread::spawn(move || {
         run(config, in_rx, out_tx)
