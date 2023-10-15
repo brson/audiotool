@@ -74,35 +74,30 @@ fn run(
 ) {
     let cancel = Arc::new(AtomicBool::from(false));
 
-    let join_handle = {
-        let tx = tx.clone();
+    thread::spawn({
         let cancel = cancel.clone();
-        thread::spawn(move || {
-            WalkDir::new(&config.reference_tracks_dir)
-                .into_iter()
-                .par_bridge()
-                .try_for_each(|entry| {
-                    let keep_going = convert_entry(
-                        &config, &entry, &tx, &cancel,
-                    );
-
-                    return keep_going;
-                });
-        })
-    };
-
-    thread::spawn(move || {
-        for req in rx.iter() {
-            match req {
-                Request::Cancel => {
-                    cancel.store(true, Ordering::SeqCst);
-                    break;
+        move || {
+            for req in rx.iter() {
+                match req {
+                    Request::Cancel => {
+                        cancel.store(true, Ordering::SeqCst);
+                        break;
+                    }
                 }
             }
         }
     });
 
-    join_handle.join().expect("join");
+    WalkDir::new(&config.reference_tracks_dir)
+        .into_iter()
+        .par_bridge()
+        .try_for_each(|entry| {
+            let keep_going = convert_entry(
+                &config, &entry, &tx, &cancel,
+            );
+
+            return keep_going;
+        });
 
     let _ = tx.send(Response::Done);
 }
