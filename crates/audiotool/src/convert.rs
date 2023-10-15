@@ -37,7 +37,7 @@ use std::sync::mpsc::{SyncSender, Receiver, sync_channel};
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
-use std::path::PathBuf;
+use std::path::{PathBuf, Path};
 
 pub enum Request {
     Cancel,
@@ -104,3 +104,13 @@ fn run(
 
     let _ = tx.send(Response::Done);
 }
+
+fn convert_file(
+    in_file: &Path,
+    out_file: &Path,
+    out_format: Format,
+    cancel: &AtomicBool,
+) -> Option<AnyResult<ConvertResult>> {
+    todo!()
+}
+
