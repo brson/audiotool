@@ -35,9 +35,8 @@ use std::thread;
 use std::path::PathBuf;
 
 pub enum Msg {
-    GetNextResult,
+    NextResult,
     Cancel,
-    Done,
 }
 
 pub enum Response {
@@ -50,15 +49,35 @@ pub struct ConvertResult {
     pub out_path: PathBuf,
 }
 
-pub fn run(config: Config) -> (
+pub fn spawn(config: Config) -> (
     SyncSender<Msg>,
     Receiver<Response>,
 ) {
     let (in_tx, in_rx) = sync_channel(2);
     let (out_tx, out_rx) = sync_channel(2);
 
-    thread::spawn(|| {
+    thread::spawn(move || {
+        run(config, in_rx, out_tx)
     });
 
     (in_tx, out_rx)
+}
+
+fn run(
+    config: Config,
+    rx: Receiver<Msg>,
+    tx: SyncSender<Response>,
+) {
+    for msg in rx.iter() {
+        match msg {
+            Msg::NextResult => {
+                todo!()
+            }
+            Msg::Cancel => {
+                todo!()
+            }
+        }
+    }
+
+    let _ = tx.send(Response::Done);
 }
