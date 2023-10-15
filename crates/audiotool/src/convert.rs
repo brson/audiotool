@@ -34,7 +34,7 @@ use std::sync::mpsc::{SyncSender, Receiver, sync_channel};
 use std::thread;
 use std::path::PathBuf;
 
-pub enum Msg {
+pub enum Request {
     NextResult,
     Cancel,
 }
@@ -50,7 +50,7 @@ pub struct ConvertResult {
 }
 
 pub fn spawn(config: Config) -> (
-    SyncSender<Msg>,
+    SyncSender<Request>,
     Receiver<Response>,
 ) {
     let (in_tx, in_rx) = sync_channel(2);
@@ -65,15 +65,15 @@ pub fn spawn(config: Config) -> (
 
 fn run(
     config: Config,
-    rx: Receiver<Msg>,
+    rx: Receiver<Request>,
     tx: SyncSender<Response>,
 ) {
-    for msg in rx.iter() {
-        match msg {
-            Msg::NextResult => {
+    for req in rx.iter() {
+        match req {
+            Request::NextResult => {
                 todo!()
             }
-            Msg::Cancel => {
+            Request::Cancel => {
                 todo!()
             }
         }
