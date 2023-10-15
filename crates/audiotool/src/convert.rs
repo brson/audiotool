@@ -30,12 +30,16 @@ mod config {
 pub use config::*;
 
 use rx::prelude::*;
+use rx::rayon::prelude::*;
+
+use rx::walkdir::WalkDir;
 use std::sync::mpsc::{SyncSender, Receiver, sync_channel};
+use std::sync::Arc;
+use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
 use std::path::PathBuf;
 
 pub enum Request {
-    NextResult,
     Cancel,
 }
 
@@ -68,13 +72,32 @@ fn run(
     rx: Receiver<Request>,
     tx: SyncSender<Response>,
 ) {
+    let cancel = Arc::new(AtomicBool::from(false));
+
+    let join_handle = {
+        let cancel = cancel.clone();
+        thread::spawn(move || {
+            WalkDir::new(&config.reference_tracks_dir)
+                .into_iter()
+                .par_bridge()
+                .try_for_each(|entry| {
+                    if cancel.load(Ordering::SeqCst) {
+                        return None;
+                    }
+
+                    todo!();
+
+                    return Some(());
+                });
+        })
+    };
+
     for req in rx.iter() {
         match req {
-            Request::NextResult => {
-                todo!()
-            }
             Request::Cancel => {
-                todo!()
+                cancel.store(true, Ordering::SeqCst);
+                join_handle.join().expect("join");
+                break;
             }
         }
     }
