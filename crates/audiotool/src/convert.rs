@@ -22,8 +22,8 @@ mod config {
     }
 
     pub struct FlacFormat {
-        bit_depth: u32,
-        sample_rate: u32,
+        pub bit_depth: u32,
+        pub sample_rate: u32,
     }
 }
 
@@ -93,7 +93,7 @@ fn run(
         .par_bridge()
         .try_for_each(|entry| {
             let keep_going = convert_entry(
-                &config, &entry, &tx, &cancel,
+                &config, entry, &tx, &cancel,
             );
 
             return keep_going;
@@ -104,13 +104,44 @@ fn run(
 
 fn convert_entry(
     config: &Config,
-    entry: &Result<DirEntry, walkdir::Error>,
+    entry: Result<DirEntry, walkdir::Error>,
     tx: &SyncSender<Response>,
     cancel: &AtomicBool,
 ) -> Option<()> {
-    if cancel.load(Ordering::SeqCst) {
-        return None;
+    let entry = match entry {
+        Err(err) => {
+            tx.send(Response::NextResult(Err(err.into())));
+            return Some(());
+        }
+        Ok(entry) => entry,
+    };
+
+    let res = convert_entry2(
+        config, &entry, cancel,
+    );
+
+    match res {
+        Ok(Some(res)) => {
+            tx.send(Response::NextResult(Ok(res)));
+            Some(())
+        }
+        Ok(None) => {
+            None
+        }
+        Err(err) => {
+            tx.send(Response::NextResult(Err(err)));
+            Some(())
+        }
     }
+}
+
+fn convert_entry2(
+    config: &Config,
+    entry: &DirEntry,
+    cancel: &AtomicBool,
+) -> AnyResult<Option<ConvertResult>> {
+    let path = entry.path();
+    let relative_path = path.strip_prefix(&config.reference_tracks_dir)?;
 
     todo!()
 }
@@ -120,7 +151,13 @@ fn convert_file(
     out_file: &Path,
     out_format: Format,
     cancel: &AtomicBool,
-) -> Option<AnyResult<ConvertResult>> {
-    todo!()
+) -> AnyResult<Option<ConvertResult>> {
+    todo!();
+
+    if cancel.load(Ordering::SeqCst) {
+        return Ok(None);
+    }
+
+    todo!();
 }
 
