@@ -140,9 +140,9 @@ fn convert_entry2(
     entry: &DirEntry,
     cancel: &AtomicBool,
 ) -> AnyResult<Option<ConvertResult>> {
-    let path = entry.path();
-    let relative_path = path.strip_prefix(&config.reference_tracks_dir)?;
-
+    let in_path = entry.path();
+    let relative_path = in_path.strip_prefix(&config.reference_tracks_dir)?;
+    let out_path = config.out_root_dir.join(&relative_path);
     todo!()
 }
 
