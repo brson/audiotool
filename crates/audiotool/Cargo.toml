@@ -9,6 +9,7 @@ edition.workspace = true
 rx.workspace = true
 rx.features = [
 ]
+serde = "1"
 
 hound = "3.5.1"
 libflac-sys = "0.3.0"

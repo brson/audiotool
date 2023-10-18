@@ -24,4 +24,5 @@ rx.features = [
   "rx-profile-std",
   "rx-profile-cli",
   "rx-feature-derive",
+  "rx-feature-serde",
 ]

@@ -1,18 +1,18 @@
 mod config {
     use std::path::PathBuf;
+    use rx::clap;
+    use rx::serde::{Serialize, Deserialize};
 
+    #[derive(Serialize, Deserialize)]
     pub struct Config {
         pub reference_tracks_dir: PathBuf,
         pub reference_track_regex: String,
         pub out_root_dir: PathBuf,
-        pub outputs: Vec<OutDesc>,
+        pub out_path_template: String,
+        pub formats: Vec<Format>,
     }
 
-    pub struct OutDesc {
-        pub dir: PathBuf,
-        pub format: Format,
-    }
-
+    #[derive(Serialize, Deserialize)]
     pub enum Format {
         Flac(FlacFormat),
         Alac,
@@ -21,6 +21,7 @@ mod config {
         Aac,
     }
 
+    #[derive(Serialize, Deserialize)]
     pub struct FlacFormat {
         pub bit_depth: u32,
         pub sample_rate: u32,
