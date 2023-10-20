@@ -154,7 +154,7 @@ fn convert_entry2(
 fn convert_file(
     in_file: &Path,
     out_file: &Path,
-    out_format: Format,
+    out_formats: &[Format],
     cancel: &AtomicBool,
 ) -> AnyResult<Option<ConvertResult>> {
     todo!();
@@ -166,3 +166,23 @@ fn convert_file(
     todo!();
 }
 
+use crate::traits::{SampleRate, BitDepth};
+
+use std::collections::BTreeMap;
+
+struct FilePlan<'up> {
+    cancel: &'up AtomicBool,
+    tx: &'up SyncSender<Response>,
+    in_file: &'up Path,
+    out_files: BTreeMap<SampleRate, BTreeMap<BitDepth, OutFile>>,
+}
+
+struct OutFile {
+    path: PathBuf,
+    format: Format,
+}
+
+impl<'up> FilePlan<'up> {
+    fn run(&self) {
+    }
+}
