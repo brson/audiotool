@@ -1,9 +1,9 @@
 mod config {
     use std::path::PathBuf;
-    use rx::clap;
     use rx::serde::{Serialize, Deserialize};
 
     #[derive(Serialize, Deserialize)]
+    #[derive(Clone)]
     pub struct Config {
         pub reference_tracks_dir: PathBuf,
         pub reference_track_regex: String,
@@ -13,8 +13,9 @@ mod config {
     }
 
     #[derive(Serialize, Deserialize)]
-    pub enum Format {
-        Flac(FlacFormat),
+    #[derive(Clone)]
+    pub enum FormatKind {
+        Flac,
         Alac,
         Vorbis,
         Mp3,
@@ -22,7 +23,9 @@ mod config {
     }
 
     #[derive(Serialize, Deserialize)]
-    pub struct FlacFormat {
+    #[derive(Clone)]
+    pub struct Format {
+        pub kind: FormatKind,
         pub bit_depth: u32,
         pub sample_rate: u32,
     }
@@ -49,6 +52,7 @@ pub enum Response {
     Done,
 }
 
+#[derive(Debug)]
 pub struct ConvertResult {
     pub in_path: PathBuf,
     pub out_path: PathBuf,
