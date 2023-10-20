@@ -97,11 +97,14 @@ fn run(
         .into_iter()
         .par_bridge()
         .try_for_each(|entry| {
-            let keep_going = convert_entry(
+            convert_entry(
                 &config, entry, &tx, &cancel,
             );
 
-            return keep_going;
+            if cancel.load(Ordering::SeqCst) {
+                return None;
+            }
+            return Some(());
         });
 
     let _ = tx.send(Response::Done);
@@ -112,42 +115,31 @@ fn convert_entry(
     entry: Result<DirEntry, walkdir::Error>,
     tx: &SyncSender<Response>,
     cancel: &AtomicBool,
-) -> Option<()> {
-    let entry = match entry {
+) {
+    match convert_entry2(
+        config,
+        entry,
+        tx,
+        cancel,
+    ) {
+        Ok(()) => { },
         Err(err) => {
             tx.send(Response::NextResult(Err(err.into())));
-            return Some(());
-        }
-        Ok(entry) => entry,
-    };
-
-    let res = convert_entry2(
-        config, &entry, cancel,
-    );
-
-    match res {
-        Ok(Some(res)) => {
-            tx.send(Response::NextResult(Ok(res)));
-            Some(())
-        }
-        Ok(None) => {
-            None
-        }
-        Err(err) => {
-            tx.send(Response::NextResult(Err(err)));
-            Some(())
+            return;
         }
     }
 }
 
 fn convert_entry2(
     config: &Config,
-    entry: &DirEntry,
+    entry: Result<DirEntry, walkdir::Error>,
+    tx: &SyncSender<Response>,
     cancel: &AtomicBool,
-) -> AnyResult<Option<ConvertResult>> {
+) -> AnyResult<()> {
+    let entry = entry?;
     let in_path = entry.path();
-    let relative_path = in_path.strip_prefix(&config.reference_tracks_dir)?;
-    let out_path = config.out_root_dir.join(&relative_path);
+    let relative_dir = in_path.strip_prefix(&config.reference_tracks_dir)?;
+    let out_dir = config.out_root_dir.join(&relative_dir);
     todo!()
 }
 
@@ -183,6 +175,15 @@ struct OutFile {
 }
 
 impl<'up> FilePlan<'up> {
+    fn new<'up_>(
+        config: &Config,
+        entry: Result<DirEntry, walkdir::Error>,
+        tx: &'up_ SyncSender<Response>,
+        cancel: &'up_ AtomicBool,
+    ) -> FilePlan<'up_> {
+        todo!()
+    }
+
     fn run(&self) {
     }
 }
