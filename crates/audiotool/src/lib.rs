@@ -87,9 +87,12 @@ pub mod codecs {
 }
 
 pub mod samplerate {
+    pub struct SampleRateConverter;
 }
 
 pub mod bitdepth {
+    pub struct BitDepthConverter;
+
     pub fn f32_to_i24(
         inbuf: &[f32],
         outbuf: &mut [i32],

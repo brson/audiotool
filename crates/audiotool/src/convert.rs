@@ -160,17 +160,25 @@ fn convert_file(
 
 use crate::types::{SampleRate, BitDepth};
 use std::collections::BTreeMap;
+use crate::io::{PcmReader, PcmWriter};
+use crate::samplerate::SampleRateConverter;
+use crate::bitdepth::BitDepthConverter;
 
 struct FilePlan<'up> {
     cancel: &'up AtomicBool,
     tx: &'up SyncSender<Response>,
     in_file: &'up Path,
-    out_files: BTreeMap<SampleRate, BTreeMap<BitDepth, OutFile>>,
+    out_files: BTreeMap<SampleRate, BTreeMap<BitDepth, Vec<OutFile>>>,
 }
 
 struct OutFile {
     path: PathBuf,
     format: Format,
+}
+
+struct OutFileWriter {
+    path: PathBuf,
+    writer: Box<dyn PcmWriter>,
 }
 
 impl<'up> FilePlan<'up> {
@@ -184,5 +192,25 @@ impl<'up> FilePlan<'up> {
     }
 
     fn run(&self) {
+        let out_files: BTreeMap<
+                SampleRate,
+            (
+                SampleRateConverter,
+                BTreeMap<
+                        BitDepth,
+                    (
+                        BitDepthConverter,
+                        Vec<OutFileWriter>
+                    )>
+            )> = todo!();
+
+        loop {
+            for (sample_rate, (sample_rate_converter, bit_depths)) in out_files.iter() {
+                for (bit_depth, (bit_depth_converter, writers)) in bit_depths.iter() {
+                    for writer in writers {
+                    }
+                }
+            }
+        }
     }
 }
