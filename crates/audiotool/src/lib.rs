@@ -3,26 +3,36 @@
 pub mod convert;
 pub mod split;
 
-pub mod traits {
+pub mod io {
     use rx::prelude::*;
+    use crate::types::*;
 
-    pub trait PcmReader<S> where S: SampleFormat {
+    pub trait PcmReader {
         fn props(&mut self) -> AnyResult<FileProps>;
 
         fn read(
             &mut self,
-            buf: &mut Vec<S::Type>,
+            buf: &mut Buf,
         ) -> AnyResult<()>;
     }
 
-    pub trait PcmWriter<S> where S: SampleFormat {
+    pub trait PcmWriter {
         fn props(&self) -> AnyResult<FileProps>;
 
         fn write(
             &mut self,
-            buf: &Vec<S::Type>,
+            buf: &Buf,
         ) -> AnyResult<()>;
     }
+
+    fn static_assertions(
+        reader: &dyn PcmReader,
+        writer: &dyn PcmWriter,
+    ) { }
+}
+
+pub mod types {
+    use rx::prelude::*;
 
     pub trait SampleFormat {
         type Type;
@@ -63,11 +73,6 @@ pub mod traits {
         K192,
         K48,
     }
-
-    fn static_assertions<S>(
-        reader: &dyn PcmReader<S>,
-        writer: &dyn PcmWriter<S>,
-    ) where S: SampleFormat { }
 }
 
 pub mod codecs {

@@ -158,8 +158,7 @@ fn convert_file(
     todo!();
 }
 
-use crate::traits::{SampleRate, BitDepth};
-
+use crate::types::{SampleRate, BitDepth};
 use std::collections::BTreeMap;
 
 struct FilePlan<'up> {
