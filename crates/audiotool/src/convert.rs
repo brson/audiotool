@@ -156,6 +156,11 @@ impl<'up> FilePlan<'up> {
         tx: &'up_ SyncSender<Response>,
         cancel: &'up_ AtomicBool,
     ) -> FilePlan<'up_> {
+        let mut sample_rates: BTreeMap<SampleRate, BTreeMap<BitDepth, Vec<OutFile>>> = BTreeMap::new();
+
+        for format in &config.formats {
+        }
+
         todo!()
     }
 
