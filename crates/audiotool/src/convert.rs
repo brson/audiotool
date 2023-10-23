@@ -237,6 +237,10 @@ impl<'up> FilePlan<'up> {
             }).collect();
 
         loop {
+            if self.cancel.load(Ordering::SeqCst) {
+                break;
+            }
+
             // todo read next data;
 
             let keep_going = sample_rates.par_iter_mut().try_for_each(|args| {
@@ -248,6 +252,8 @@ impl<'up> FilePlan<'up> {
                     ),
                 ) = args;
 
+                todo!();
+
                 bit_depths.par_iter_mut().try_for_each(|args| {
                     let (
                         bit_depth,
@@ -257,7 +263,18 @@ impl<'up> FilePlan<'up> {
                         ),
                     ) = args;
 
-                    Some(())
+                    todo!();
+
+                    writers.par_iter_mut().try_for_each(|writer| {
+
+                        if self.cancel.load(Ordering::SeqCst) {
+                            return None;
+                        }
+
+                        todo!();
+
+                        Some(())
+                    })
                 })
             });
 
@@ -265,5 +282,19 @@ impl<'up> FilePlan<'up> {
                 break;
             }
         }
+
+        if self.cancel.load(Ordering::SeqCst) {
+            // Do cleanups and send cancellation errors.
+            for (_, (_, bit_depths)) in sample_rates.into_iter() {
+                for (_, (_, writers)) in bit_depths.into_iter() {
+                    for writer in writers {
+                        if let Some(writer) = writer {
+                            todo!()
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }
