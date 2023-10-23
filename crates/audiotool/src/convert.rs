@@ -116,46 +116,14 @@ fn convert_entry(
     tx: &SyncSender<Response>,
     cancel: &AtomicBool,
 ) {
-    match convert_entry2(
+    let plan = FilePlan::new(
         config,
         entry,
         tx,
         cancel,
-    ) {
-        Ok(()) => { },
-        Err(err) => {
-            tx.send(Response::NextResult(Err(err.into())));
-            return;
-        }
-    }
-}
+    );
 
-fn convert_entry2(
-    config: &Config,
-    entry: Result<DirEntry, walkdir::Error>,
-    tx: &SyncSender<Response>,
-    cancel: &AtomicBool,
-) -> AnyResult<()> {
-    let entry = entry?;
-    let in_path = entry.path();
-    let relative_dir = in_path.strip_prefix(&config.reference_tracks_dir)?;
-    let out_dir = config.out_root_dir.join(&relative_dir);
-    todo!()
-}
-
-fn convert_file(
-    in_file: &Path,
-    out_file: &Path,
-    out_formats: &[Format],
-    cancel: &AtomicBool,
-) -> AnyResult<Option<ConvertResult>> {
-    todo!();
-
-    if cancel.load(Ordering::SeqCst) {
-        return Ok(None);
-    }
-
-    todo!();
+    plan.run();
 }
 
 use crate::types::{SampleRate, BitDepth};
@@ -283,18 +251,15 @@ impl<'up> FilePlan<'up> {
             }
         }
 
-        if self.cancel.load(Ordering::SeqCst) {
-            // Do cleanups and send cancellation errors.
-            for (_, (_, bit_depths)) in sample_rates.into_iter() {
-                for (_, (_, writers)) in bit_depths.into_iter() {
-                    for writer in writers {
-                        if let Some(writer) = writer {
-                            todo!()
-                        }
+        // Do cleanups and send cancellation errors.
+        for (_, (_, bit_depths)) in sample_rates.into_iter() {
+            for (_, (_, writers)) in bit_depths.into_iter() {
+                for writer in writers {
+                    if let Some(writer) = writer {
+                        todo!()
                     }
                 }
             }
         }
-
     }
 }
