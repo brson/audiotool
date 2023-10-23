@@ -65,6 +65,7 @@ pub mod types {
     }
 
     #[derive(Eq, PartialEq, Ord, PartialOrd)]
+    #[derive(Copy, Clone)]
     pub enum BitDepth {
         F32,
         I24,
@@ -72,6 +73,7 @@ pub mod types {
     }
 
     #[derive(Eq, PartialEq, Ord, PartialOrd)]
+    #[derive(Copy, Clone)]
     pub enum SampleRate {
         K192,
         K48,
@@ -79,6 +81,18 @@ pub mod types {
 }
 
 pub mod codecs {
+    use std::path::Path;
+    use crate::io::*;
+    use crate::types::*;
+
+    pub fn reader(path: &Path) -> Box<dyn PcmReader> {
+        todo!()
+    }
+
+    pub fn writer(path: &Path, props: FileProps) -> Box<dyn PcmReader> {
+        todo!()
+    }
+    
     pub mod wav {
     }
 

@@ -168,7 +168,7 @@ struct FilePlan<'up> {
     cancel: &'up AtomicBool,
     tx: &'up SyncSender<Response>,
     in_file: &'up Path,
-    out_files: BTreeMap<SampleRate, BTreeMap<BitDepth, Vec<OutFile>>>,
+    sample_rates: BTreeMap<SampleRate, BTreeMap<BitDepth, Vec<OutFile>>>,
 }
 
 struct OutFile {
@@ -192,7 +192,7 @@ impl<'up> FilePlan<'up> {
     }
 
     fn run(&self) {
-        let sample_rates: BTreeMap<
+        let mut sample_rates: BTreeMap<
                 SampleRate,
             (
                 SampleRateConverter,
@@ -200,9 +200,41 @@ impl<'up> FilePlan<'up> {
                         BitDepth,
                     (
                         BitDepthConverter,
-                        Vec<OutFileWriter>
+                        Vec<Option<OutFileWriter>>
                     )>
-            )> = todo!();
+            )> = self.sample_rates.iter().map(|args| {
+                let (
+                    sample_rate,
+                    bit_depths,
+                ) = args;
+
+                let bit_depths = bit_depths.iter().map(|args| {
+                    let (
+                        bit_depth,
+                        outfiles,
+                    ) = args;
+
+                    let writers = outfiles.iter().map(|outfile| {
+                        todo!()
+                    }).collect();
+
+                    (
+                        *bit_depth,
+                        (
+                            BitDepthConverter,
+                            writers,
+                        ),
+                    )
+                }).collect();
+
+                (
+                    *sample_rate,
+                    (
+                        SampleRateConverter,
+                        bit_depths,
+                    ),
+                )
+            }).collect();
 
         loop {
             // todo read next data;
