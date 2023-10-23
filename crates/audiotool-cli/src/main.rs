@@ -46,13 +46,15 @@ impl Cli {
 }
 
 impl ConvertCommand {
-    fn run(&self, args: &Args) -> AnyResult<()> {
+    fn run(&self, _args: &Args) -> AnyResult<()> {
         use audiotool::convert as cvt;
 
         let config = fs::read_to_string(&self.config)?;
         let config: cvt::Config = rx::toml::from_str(&config)?;
 
-        let (tx, rx) = cvt::spawn(config);
+        let (_tx, rx) = cvt::spawn(config);
+
+        // todo handle cancellation with tx
 
         loop {
             let resp = rx.recv()?;
