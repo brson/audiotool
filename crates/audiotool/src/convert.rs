@@ -204,13 +204,34 @@ impl<'up> FilePlan<'up> {
                     )>
             )> = todo!();
 
+        let sample_rates: Vec<(
+            SampleRate,
+            SampleRateConverter,
+            Vec<(
+                BitDepth,
+                BitDepthConverter,
+                Vec<OutFileWriter>
+            )>
+        )> = todo!();
+        
         loop {
-            for (sample_rate, (sample_rate_converter, bit_depths)) in out_files.iter() {
-                for (bit_depth, (bit_depth_converter, writers)) in bit_depths.iter() {
-                    for writer in writers {
-                    }
-                }
-            }
+            sample_rates.par_iter_mut().try_for_each(|args| {
+                let (
+                    sample_rate,
+                    sample_rate_converter,
+                    bit_depths
+                ) = args;
+
+                bit_depths.par_iter_mut().try_for_each(|args| {
+                    let (
+                        bit_depth,
+                        bit_depth_converter,
+                        writers,
+                    ) = args;
+
+                    Some(())
+                })
+            });
         }
     }
 }

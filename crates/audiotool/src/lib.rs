@@ -7,7 +7,7 @@ pub mod io {
     use rx::prelude::*;
     use crate::types::*;
 
-    pub trait PcmReader {
+    pub trait PcmReader: Send {
         fn props(&mut self) -> AnyResult<FileProps>;
 
         fn read(
@@ -16,7 +16,7 @@ pub mod io {
         ) -> AnyResult<()>;
     }
 
-    pub trait PcmWriter {
+    pub trait PcmWriter: Send {
         fn props(&self) -> AnyResult<FileProps>;
 
         fn write(
