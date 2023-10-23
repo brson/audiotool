@@ -57,18 +57,21 @@ pub mod types {
         pub sample_rate: SampleRate,
     }
 
+    #[derive(Eq, PartialEq, Ord, PartialOrd)]
     pub enum Format {
         Wav,
         Flac,
         Vorbis,
     }
 
+    #[derive(Eq, PartialEq, Ord, PartialOrd)]
     pub enum BitDepth {
         F32,
         I24,
         I16,
     }
 
+    #[derive(Eq, PartialEq, Ord, PartialOrd)]
     pub enum SampleRate {
         K192,
         K48,

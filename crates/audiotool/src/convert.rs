@@ -192,7 +192,7 @@ impl<'up> FilePlan<'up> {
     }
 
     fn run(&self) {
-        let out_files: BTreeMap<
+        let sample_rates: BTreeMap<
                 SampleRate,
             (
                 SampleRateConverter,
@@ -204,29 +204,23 @@ impl<'up> FilePlan<'up> {
                     )>
             )> = todo!();
 
-        let sample_rates: Vec<(
-            SampleRate,
-            SampleRateConverter,
-            Vec<(
-                BitDepth,
-                BitDepthConverter,
-                Vec<OutFileWriter>
-            )>
-        )> = todo!();
-        
         loop {
             sample_rates.par_iter_mut().try_for_each(|args| {
                 let (
                     sample_rate,
-                    sample_rate_converter,
-                    bit_depths
+                    (
+                        sample_rate_converter,
+                        bit_depths,
+                    ),
                 ) = args;
 
                 bit_depths.par_iter_mut().try_for_each(|args| {
                     let (
                         bit_depth,
-                        bit_depth_converter,
-                        writers,
+                        (
+                            bit_depth_converter,
+                            writers,
+                        ),
                     ) = args;
 
                     Some(())
