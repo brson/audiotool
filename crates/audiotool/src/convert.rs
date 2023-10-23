@@ -205,7 +205,9 @@ impl<'up> FilePlan<'up> {
             )> = todo!();
 
         loop {
-            sample_rates.par_iter_mut().try_for_each(|args| {
+            // todo read next data;
+
+            let keep_going = sample_rates.par_iter_mut().try_for_each(|args| {
                 let (
                     sample_rate,
                     (
@@ -226,6 +228,10 @@ impl<'up> FilePlan<'up> {
                     Some(())
                 })
             });
+
+            if keep_going.is_none() {
+                break;
+            }
         }
     }
 }
