@@ -11,13 +11,6 @@ impl SampleFormat for F32 {
     type Type = f32;
 }
 
-pub enum Buf {
-    Uninit,
-    F32(Vec<f32>),
-    I24(Vec<i32>),
-    I16(Vec<i16>),
-}
-
 #[derive(Serialize, Deserialize)]
 #[derive(Eq, PartialEq, Ord, PartialOrd)]
 #[derive(Copy, Clone)]

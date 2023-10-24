@@ -1,6 +1,13 @@
 use rx::prelude::*;
 use crate::types::*;
 
+pub enum Buf {
+    Uninit,
+    F32(Vec<f32>),
+    I24(Vec<i32>),
+    I16(Vec<i16>),
+}
+
 pub trait PcmReader: Send {
     fn props(&mut self) -> AnyResult<Format>;
 
