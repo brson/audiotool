@@ -344,9 +344,12 @@ pub struct OutFile {
 }
 
 impl Config {
-    fn outputs_for<'s>(&'s self, path: &Path) -> impl Iterator<Item = OutFile> + 's {
-        self.formats.iter().map(|format| {
-            todo!()
+    fn outputs_for<'s>(&'s self, path: &'s Path) -> impl Iterator<Item = OutFile> + 's {
+        self.formats.iter().copied().map(|format| {
+            OutFile {
+                path: path.to_owned(),
+                format,
+            }
         })
     }
 }
