@@ -141,9 +141,6 @@ impl<'up> FilePlan<'up> {
     ) -> FilePlan<'up_> {
         let mut sample_rates: BTreeMap<SampleRate, BTreeMap<BitDepth, Vec<OutFile>>> = BTreeMap::new();
 
-        for format in &config.formats {
-        }
-
         todo!()
     }
 
@@ -249,5 +246,13 @@ impl<'up> FilePlan<'up> {
                 }
             }
         }
+    }
+}
+
+impl Config {
+    fn outputs_for<'s>(&'s self, path: &Path) -> impl Iterator<Item = OutFile> + 's {
+        self.formats.iter().map(|format| {
+            todo!()
+        })
     }
 }
