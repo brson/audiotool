@@ -45,7 +45,7 @@ pub mod plan {
     }
 
     pub enum Response {
-        Done(Option<Plan>),
+        Done(Option<AnyResult<Plan>>),
     }
 
     pub fn spawn(config: Config) -> (
@@ -67,7 +67,8 @@ pub mod plan {
         rx: Receiver<Request>,
         tx: SyncSender<Response>,
     ) {
-        todo!()
+        for entry in WalkDir::new(&config.reference_tracks_dir).into_iter() {
+        }
     }
 }
 
