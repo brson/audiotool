@@ -101,7 +101,7 @@ pub mod plan {
 
 pub mod exec {
 
-    use super::config::*;
+    use super::plan::{Plan, InfilePlan};
 
     use rx::prelude::*;
     use rx::rayon::{self, prelude::*};
@@ -128,7 +128,7 @@ pub mod exec {
         pub out_path: PathBuf,
     }
 
-    pub fn spawn(config: Config) -> (
+    pub fn spawn(plan: Plan) -> (
         SyncSender<Request>,
         Receiver<Response>,
     ) {
@@ -136,14 +136,14 @@ pub mod exec {
         let (out_tx, out_rx) = sync_channel(1);
 
         thread::spawn(move || {
-            run(config, in_rx, out_tx)
+            run(plan, in_rx, out_tx)
         });
 
         (in_tx, out_rx)
     }
 
     fn run(
-        config: Config,
+        plan: Plan,
         rx: Receiver<Request>,
         tx: SyncSender<Response>,
     ) {
@@ -163,32 +163,18 @@ pub mod exec {
             }
         });
 
-        WalkDir::new(&config.reference_tracks_dir)
-            .into_iter()
-            .par_bridge()
-            .try_for_each(|entry| {
-                convert_entry(
-                    &config, entry, &tx, &cancel,
-                );
-
-                if cancel.load(Ordering::SeqCst) {
-                    return None;
-                }
-                return Some(());
-            });
+        todo!();
 
         let _ = tx.send(Response::Done);
     }
 
-    fn convert_entry(
-        config: &Config,
-        entry: Result<DirEntry, walkdir::Error>,
+    fn convert_file(
+        plan: &InfilePlan,
         tx: &SyncSender<Response>,
         cancel: &AtomicBool,
     ) {
         let plan = FilePlan::new(
-            config,
-            entry,
+            plan,
             tx,
             cancel,
         );
@@ -217,8 +203,7 @@ pub mod exec {
 
     impl<'up> FilePlan<'up> {
         fn new<'up_>(
-            config: &Config,
-            entry: Result<DirEntry, walkdir::Error>,
+            plan: &InfilePlan,
             tx: &'up_ SyncSender<Response>,
             cancel: &'up_ AtomicBool,
         ) -> FilePlan<'up_> {
