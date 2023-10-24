@@ -1,7 +1,7 @@
 mod config {
     use std::path::PathBuf;
     use rx::serde::{Serialize, Deserialize};
-    use crate::types::{Codec, BitDepth, SampleRate};
+    use crate::types::{Format};
 
     #[derive(Serialize, Deserialize)]
     #[derive(Clone)]
@@ -11,15 +11,6 @@ mod config {
         pub out_root_dir: PathBuf,
         pub out_path_template: String,
         pub formats: Vec<Format>,
-    }
-
-    #[derive(Serialize, Deserialize)]
-    #[derive(Eq, PartialEq, Ord, PartialOrd)]
-    #[derive(Copy, Clone)]
-    pub struct Format {
-        pub codec: Codec,
-        pub bit_depth: BitDepth,
-        pub sample_rate: SampleRate,
     }
 }
 
@@ -118,7 +109,7 @@ fn convert_entry(
     plan.run();
 }
 
-use crate::types::{SampleRate, BitDepth};
+use crate::types::{Format, SampleRate, BitDepth};
 use std::collections::BTreeMap;
 use crate::io::{PcmReader, PcmWriter};
 use crate::samplerate::SampleRateConverter;
