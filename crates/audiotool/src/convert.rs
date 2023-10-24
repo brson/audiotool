@@ -202,6 +202,7 @@ pub mod exec {
     // todo use tempfile and do atomic rename
     struct OutFileWriter {
         path: PathBuf,
+        tmp_path: PathBuf,
         writer: Box<dyn PcmWriter>,
     }
 
@@ -240,9 +241,11 @@ pub mod exec {
                         ) = args;
 
                         let writers = outfiles.iter().map(|outfile| {
+                            let tmp_path = tmp_path(&outfile.path); 
                             Some(OutFileWriter {
                                 path: outfile.path.clone(),
-                                writer: codecs::writer(&outfile.path, outfile.format),
+                                tmp_path: tmp_path.clone(),
+                                writer: codecs::writer(&tmp_path, outfile.format),
                             })
                         }).collect();
 
@@ -325,7 +328,10 @@ pub mod exec {
             }
         }
     }
-    
+
+    fn tmp_path(path: &Path) -> PathBuf {
+        todo!()
+    }
 }
 
 use crate::types::Format;
@@ -341,7 +347,7 @@ impl Config {
     fn outputs_for<'s>(&'s self, path: &'s Path) -> impl Iterator<Item = OutFile> + 's {
         self.formats.iter().copied().map(|format| {
             OutFile {
-                path: path.to_owned(),
+                path: todo!(),
                 format,
             }
         })
