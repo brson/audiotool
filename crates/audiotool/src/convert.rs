@@ -1,4 +1,4 @@
-mod config {
+pub mod config {
     use std::path::PathBuf;
     use rx::serde::{Serialize, Deserialize};
     use crate::types::{Format};
@@ -14,7 +14,64 @@ mod config {
     }
 }
 
-pub use config::*;
+pub mod plan {
+    use rx::prelude::*;
+    use rx::rayon::{self, prelude::*};
+
+    use super::config::Config;
+    use crate::types::Format;
+
+    use rx::walkdir::{self, WalkDir, DirEntry};
+    use std::sync::mpsc::{SyncSender, Receiver, sync_channel};
+    use std::path::PathBuf;
+    use std::thread;
+
+    pub struct Plan {
+        pub outputs: Vec<InfilePlan>,
+    }
+
+    pub struct InfilePlan {
+        pub infile: PathBuf,
+        pub outfiles: Vec<OutFile>,
+    }
+
+    pub struct OutFile {
+        path: PathBuf,
+        format: Format,
+    }
+
+    pub enum Request {
+        Cancel,
+    }
+
+    pub enum Response {
+        Done(Option<Plan>),
+    }
+
+    pub fn spawn(config: Config) -> (
+        SyncSender<Request>,
+        Receiver<Response>,
+    ) {
+        let (in_tx, in_rx) = sync_channel(1);
+        let (out_tx, out_rx) = sync_channel(1);
+
+        thread::spawn(move || {
+            run(config, in_rx, out_tx)
+        });
+
+        (in_tx, out_rx)
+    }
+
+    fn run(
+        config: Config,
+        rx: Receiver<Request>,
+        tx: SyncSender<Response>,
+    ) {
+        todo!()
+    }
+}
+
+use config::*;
 
 use rx::prelude::*;
 use rx::rayon::{self, prelude::*};

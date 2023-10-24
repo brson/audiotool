@@ -50,7 +50,7 @@ impl ConvertCommand {
         use audiotool::convert as cvt;
 
         let config = fs::read_to_string(&self.config)?;
-        let config: cvt::Config = rx::toml::from_str(&config)?;
+        let config: cvt::config::Config = rx::toml::from_str(&config)?;
 
         let (_tx, rx) = cvt::spawn(config);
 
