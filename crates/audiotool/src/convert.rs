@@ -184,6 +184,7 @@ pub mod exec {
         plan.run();
     }
 
+    use rx::rand::Rng;
     use crate::types::{Format, SampleRate, BitDepth};
     use std::collections::BTreeMap;
     use crate::io::{PcmReader, PcmWriter};
@@ -329,7 +330,13 @@ pub mod exec {
     }
 
     fn tmp_path(path: &Path) -> PathBuf {
-        todo!()
+        let mut tmp_path = path.to_owned();
+        let ext = path.extension().expect("extension");
+        let ext = ext.to_string_lossy().to_string();
+        let random: u16 = rx::rand::thread_rng().gen();
+        let ext = format!("{ext}.{random:04X}.tmp");
+        tmp_path.set_extension(ext);
+        tmp_path
     }
 }
 
