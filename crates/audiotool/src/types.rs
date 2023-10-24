@@ -18,7 +18,7 @@ pub enum Buf {
     I16(Vec<i16>),
 }
 
-pub struct FileProps {
+pub struct Encoding {
     pub format: Format,
     pub bit_depth: BitDepth,
     pub sample_rate: SampleRate,

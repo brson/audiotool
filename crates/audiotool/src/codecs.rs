@@ -6,7 +6,7 @@ pub fn reader(path: &Path) -> Box<dyn PcmReader> {
     todo!()
 }
 
-pub fn writer(path: &Path, props: FileProps) -> Box<dyn PcmReader> {
+pub fn writer(path: &Path, props: Encoding) -> Box<dyn PcmReader> {
     todo!()
 }
 
