@@ -22,7 +22,7 @@ pub mod plan {
     use crate::types::Format;
 
     use rx::walkdir::{self, WalkDir, DirEntry};
-    use std::sync::mpsc::{SyncSender, Receiver, sync_channel};
+    use std::sync::mpsc::{SyncSender, Receiver, sync_channel, TryRecvError};
     use std::path::PathBuf;
     use std::thread;
 
@@ -45,7 +45,7 @@ pub mod plan {
     }
 
     pub enum Response {
-        Done(Option<AnyResult<Plan>>),
+        Done(AnyResult<Option<Plan>>),
     }
 
     pub fn spawn(config: Config) -> (
@@ -67,8 +67,36 @@ pub mod plan {
         rx: Receiver<Request>,
         tx: SyncSender<Response>,
     ) {
+        let maybe_plan = run2(config, rx);
+        let _ = tx.send(Response::Done(maybe_plan));
+    }
+
+    fn run2(
+        config: Config,
+        rx: Receiver<Request>,
+    ) -> AnyResult<Option<Plan>> {
+        let mut outputs = Vec::new();
+
         for entry in WalkDir::new(&config.reference_tracks_dir).into_iter() {
+            let entry = entry?;
+
+            match rx.try_recv() {
+                Ok(Request::Cancel) | Err(TryRecvError::Disconnected) => {
+                    return Ok(None);
+                }
+                Err(TryRecvError::Empty) => {
+                    // nop
+                }
+            }
+
+            for outfile in config.outputs_for(entry.path()) {
+                todo!()
+            }
         }
+
+        Ok(Some(Plan {
+            outputs,
+        }))
     }
 }
 
