@@ -187,7 +187,7 @@ pub mod exec {
     use rx::rand::Rng;
     use crate::types::{Format, SampleRate, BitDepth};
     use std::collections::BTreeMap;
-    use crate::io::{PcmReader, PcmWriter};
+    use crate::io::{PcmReader, PcmWriter, Buf};
     use crate::samplerate::SampleRateConverter;
     use crate::bitdepth::BitDepthConverter;
     use crate::codecs;
@@ -278,14 +278,20 @@ pub mod exec {
                     )
                 }).collect();
 
-            let reader = codecs::reader(&self.infile);
+            let mut buf = Buf::Uninit;
+            let mut reader = codecs::reader(&self.infile);
 
             loop {
                 if self.cancel.load(Ordering::SeqCst) {
                     break;
                 }
 
-                // todo read next data;
+                match reader.read(&mut buf) {
+                    Ok(()) => { },
+                    Err(_e) => {
+                        todo!()
+                    }
+                }
 
                 let keep_going = sample_rates.par_iter_mut().try_for_each(|args| {
                     let (

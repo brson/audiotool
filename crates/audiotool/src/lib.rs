@@ -7,11 +7,41 @@ pub mod types;
 pub mod codecs;
 
 pub mod samplerate {
+    use crate::types::SampleRate;
+    use crate::io::Buf;
+
     pub struct SampleRateConverter;
+
+    impl SampleRateConverter {
+        pub fn new(inrate: SampleRate, outrate: SampleRate) -> SampleRateConverter {
+            todo!()
+        }
+
+        pub fn convert(&mut self, inbuf: &Buf) -> &Buf {
+            todo!()
+        }
+
+        pub fn finalize(&mut self) -> &Buf {
+            todo!()
+        }
+    }
 }
 
 pub mod bitdepth {
+    use crate::types::BitDepth;
+    use crate::io::Buf;
+
     pub struct BitDepthConverter;
+
+    impl BitDepthConverter {
+        pub fn new(inrate: BitDepth, outrate: BitDepth) -> BitDepthConverter {
+            todo!()
+        }
+
+        pub fn convert(&mut self, inbuf: &Buf) -> &Buf {
+            todo!()
+        }
+    }
 
     pub fn f32_to_i24(
         inbuf: &[f32],

@@ -32,3 +32,9 @@ fn static_assertions(
     reader: &dyn PcmReader,
     writer: &dyn PcmWriter,
 ) { }
+
+impl Buf {
+    fn is_empty(&self) -> bool {
+        todo!()
+    }
+}
