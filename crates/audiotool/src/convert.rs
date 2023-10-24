@@ -189,15 +189,17 @@ pub mod exec {
     use crate::io::{PcmReader, PcmWriter};
     use crate::samplerate::SampleRateConverter;
     use crate::bitdepth::BitDepthConverter;
+    use crate::codecs;
     use super::OutFile;
 
     struct FilePlan<'up> {
         cancel: &'up AtomicBool,
         tx: &'up SyncSender<Response>,
-        in_file: &'up Path,
+        infile: &'up Path,
         sample_rates: BTreeMap<SampleRate, BTreeMap<BitDepth, Vec<OutFile>>>,
     }
 
+    // todo use tempfile and do atomic rename
     struct OutFileWriter {
         path: PathBuf,
         writer: Box<dyn PcmWriter>,
@@ -240,7 +242,7 @@ pub mod exec {
                         let writers = outfiles.iter().map(|outfile| {
                             Some(OutFileWriter {
                                 path: outfile.path.clone(),
-                                writer: crate::codecs::writer(&outfile.path, outfile.format),
+                                writer: codecs::writer(&outfile.path, outfile.format),
                             })
                         }).collect();
 
@@ -261,6 +263,8 @@ pub mod exec {
                         ),
                     )
                 }).collect();
+
+            let reader = codecs::reader(&self.infile);
 
             loop {
                 if self.cancel.load(Ordering::SeqCst) {
