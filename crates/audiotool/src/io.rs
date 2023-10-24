@@ -17,6 +17,8 @@ pub trait PcmWriter: Send {
         &mut self,
         buf: &Buf,
     ) -> AnyResult<()>;
+
+    fn finalize(&mut self) -> AnyResult<()>;
 }
 
 fn static_assertions(
