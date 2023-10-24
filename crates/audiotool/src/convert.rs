@@ -163,7 +163,9 @@ pub mod exec {
             }
         });
 
-        todo!();
+        plan.outputs.par_iter().for_each(|infile_plan| {
+            convert_file(infile_plan, &tx, &cancel);
+        });
 
         let _ = tx.send(Response::Done);
     }
