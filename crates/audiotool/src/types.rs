@@ -18,6 +18,9 @@ pub enum Buf {
     I16(Vec<i16>),
 }
 
+#[derive(Serialize, Deserialize)]
+#[derive(Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Copy, Clone)]
 pub struct Encoding {
     pub format: Format,
     pub bit_depth: BitDepth,
@@ -26,6 +29,7 @@ pub struct Encoding {
 
 #[derive(Serialize, Deserialize)]
 #[derive(Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Copy, Clone)]
 pub enum Format {
     Wav,
     Flac,
