@@ -122,7 +122,7 @@ struct FilePlan<'up> {
     sample_rates: BTreeMap<SampleRate, BTreeMap<BitDepth, Vec<OutFile>>>,
 }
 
-struct OutFile {
+pub struct OutFile {
     path: PathBuf,
     format: Format,
 }
@@ -255,4 +255,13 @@ impl Config {
             todo!()
         })
     }
+}
+
+pub struct Convs {
+    pub outputs: Vec<InfileConvs>,
+}
+
+pub struct InfileConvs {
+    pub infile: PathBuf,
+    pub outfiles: Vec<OutFile>,
 }
