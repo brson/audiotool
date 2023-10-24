@@ -238,7 +238,10 @@ pub mod exec {
                         ) = args;
 
                         let writers = outfiles.iter().map(|outfile| {
-                            todo!()
+                            Some(OutFileWriter {
+                                path: outfile.path.clone(),
+                                writer: crate::codecs::writer(&outfile.path, outfile.format),
+                            })
                         }).collect();
 
                         (
