@@ -1,6 +1,7 @@
 mod config {
     use std::path::PathBuf;
     use rx::serde::{Serialize, Deserialize};
+    use crate::types::{BitDepth, SampleRate};
 
     #[derive(Serialize, Deserialize)]
     #[derive(Clone)]
@@ -26,8 +27,8 @@ mod config {
     #[derive(Clone)]
     pub struct Format {
         pub kind: FormatKind,
-        pub bit_depth: u32,
-        pub sample_rate: u32,
+        pub bit_depth: BitDepth,
+        pub sample_rate: SampleRate,
     }
 }
 

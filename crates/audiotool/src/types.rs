@@ -1,4 +1,5 @@
 use rx::prelude::*;
+use rx::serde::{Serialize, Deserialize};
 
 pub trait SampleFormat {
     type Type;
@@ -23,6 +24,7 @@ pub struct FileProps {
     pub sample_rate: SampleRate,
 }
 
+#[derive(Serialize, Deserialize)]
 #[derive(Eq, PartialEq, Ord, PartialOrd)]
 pub enum Format {
     Wav,
@@ -30,6 +32,7 @@ pub enum Format {
     Vorbis,
 }
 
+#[derive(Serialize, Deserialize)]
 #[derive(Eq, PartialEq, Ord, PartialOrd)]
 #[derive(Copy, Clone)]
 pub enum BitDepth {
@@ -38,6 +41,7 @@ pub enum BitDepth {
     I16,
 }
 
+#[derive(Serialize, Deserialize)]
 #[derive(Eq, PartialEq, Ord, PartialOrd)]
 #[derive(Copy, Clone)]
 pub enum SampleRate {
