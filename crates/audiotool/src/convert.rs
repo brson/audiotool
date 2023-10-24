@@ -208,13 +208,24 @@ pub mod exec {
 
     impl<'up> FilePlan<'up> {
         fn new<'up_>(
-            plan: &InfilePlan,
+            plan: &'up_ InfilePlan,
             tx: &'up_ SyncSender<Response>,
             cancel: &'up_ AtomicBool,
         ) -> FilePlan<'up_> {
             let mut sample_rates: BTreeMap<SampleRate, BTreeMap<BitDepth, Vec<OutFile>>> = BTreeMap::new();
 
-            todo!()
+            for outfile in &plan.outfiles {
+                let mut bit_depths = sample_rates.entry(outfile.format.sample_rate).or_default();
+                let mut out_files = bit_depths.entry(outfile.format.bit_depth).or_default();
+                out_files.push(outfile.clone());
+            }
+
+            FilePlan {
+                cancel,
+                tx,
+                infile: &plan.infile,
+                sample_rates,
+            }
         }
 
         fn run(&self) {
@@ -344,6 +355,7 @@ use crate::types::Format;
 use self::config::Config;
 use std::path::{Path, PathBuf};
 
+#[derive(Clone)]
 pub struct OutFile {
     path: PathBuf,
     format: Format,
