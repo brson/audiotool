@@ -199,7 +199,6 @@ pub mod exec {
         sample_rates: BTreeMap<SampleRate, BTreeMap<BitDepth, Vec<OutFile>>>,
     }
 
-    // todo use tempfile and do atomic rename
     struct OutFileWriter {
         path: PathBuf,
         tmp_path: PathBuf,
