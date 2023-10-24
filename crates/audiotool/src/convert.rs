@@ -20,6 +20,7 @@ pub mod plan {
 
     use super::config::Config;
     use crate::types::Format;
+    use super::OutFile;
 
     use rx::walkdir::{self, WalkDir, DirEntry};
     use std::sync::mpsc::{SyncSender, Receiver, sync_channel, TryRecvError};
@@ -33,11 +34,6 @@ pub mod plan {
     pub struct InfilePlan {
         pub infile: PathBuf,
         pub outfiles: Vec<OutFile>,
-    }
-
-    pub struct OutFile {
-        path: PathBuf,
-        format: Format,
     }
 
     pub enum Request {
@@ -78,8 +74,6 @@ pub mod plan {
         let mut outputs = Vec::new();
 
         for entry in WalkDir::new(&config.reference_tracks_dir).into_iter() {
-            let entry = entry?;
-
             match rx.try_recv() {
                 Ok(Request::Cancel) | Err(TryRecvError::Disconnected) => {
                     return Ok(None);
@@ -89,9 +83,14 @@ pub mod plan {
                 }
             }
 
-            for outfile in config.outputs_for(entry.path()) {
-                todo!()
-            }
+            let entry = entry?;
+            let infile = entry.path();
+            let outfiles = config.outputs_for(&infile).collect();
+
+            outputs.push(InfilePlan {
+                infile: infile.to_owned(),
+                outfiles,
+            })
         }
 
         Ok(Some(Plan {
