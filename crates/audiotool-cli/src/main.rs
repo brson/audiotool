@@ -52,7 +52,7 @@ impl ConvertCommand {
         let config = fs::read_to_string(&self.config)?;
         let config: cvt::config::Config = rx::toml::from_str(&config)?;
 
-        let (_tx, rx) = cvt::spawn(config);
+        let (_tx, rx) = cvt::exec::spawn(config);
 
         // todo handle cancellation with tx
 
@@ -60,10 +60,10 @@ impl ConvertCommand {
             let resp = rx.recv()?;
 
             match resp {
-                cvt::Response::NextResult(res) => {
+                cvt::exec::Response::NextResult(res) => {
                     println!("{res:#?}");
                 }
-                cvt::Response::Done => {
+                cvt::exec::Response::Done => {
                     break;
                 }
             }
