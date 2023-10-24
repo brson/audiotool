@@ -1,7 +1,7 @@
 mod config {
     use std::path::PathBuf;
     use rx::serde::{Serialize, Deserialize};
-    use crate::types::{Format, BitDepth, SampleRate};
+    use crate::types::{Codec, BitDepth, SampleRate};
 
     #[derive(Serialize, Deserialize)]
     #[derive(Clone)]
@@ -10,14 +10,14 @@ mod config {
         pub reference_track_regex: String,
         pub out_root_dir: PathBuf,
         pub out_path_template: String,
-        pub formats: Vec<Encoding>,
+        pub formats: Vec<Format>,
     }
 
     #[derive(Serialize, Deserialize)]
     #[derive(Eq, PartialEq, Ord, PartialOrd)]
     #[derive(Copy, Clone)]
-    pub struct Encoding {
-        pub format: Format,
+    pub struct Format {
+        pub codec: Codec,
         pub bit_depth: BitDepth,
         pub sample_rate: SampleRate,
     }
@@ -133,7 +133,7 @@ struct FilePlan<'up> {
 
 struct OutFile {
     path: PathBuf,
-    format: Encoding,
+    format: Format,
 }
 
 struct OutFileWriter {

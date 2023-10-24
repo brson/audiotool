@@ -21,8 +21,8 @@ pub enum Buf {
 #[derive(Serialize, Deserialize)]
 #[derive(Eq, PartialEq, Ord, PartialOrd)]
 #[derive(Copy, Clone)]
-pub struct Encoding {
-    pub format: Format,
+pub struct Format {
+    pub codec: Codec,
     pub bit_depth: BitDepth,
     pub sample_rate: SampleRate,
 }
@@ -30,7 +30,7 @@ pub struct Encoding {
 #[derive(Serialize, Deserialize)]
 #[derive(Eq, PartialEq, Ord, PartialOrd)]
 #[derive(Copy, Clone)]
-pub enum Format {
+pub enum Codec {
     Wav,
     Flac,
     Vorbis,

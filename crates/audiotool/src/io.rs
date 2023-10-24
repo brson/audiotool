@@ -2,7 +2,7 @@ use rx::prelude::*;
 use crate::types::*;
 
 pub trait PcmReader: Send {
-    fn props(&mut self) -> AnyResult<Encoding>;
+    fn props(&mut self) -> AnyResult<Format>;
 
     fn read(
         &mut self,
@@ -11,7 +11,7 @@ pub trait PcmReader: Send {
 }
 
 pub trait PcmWriter: Send {
-    fn props(&self) -> AnyResult<Encoding>;
+    fn props(&self) -> AnyResult<Format>;
 
     fn write(
         &mut self,
