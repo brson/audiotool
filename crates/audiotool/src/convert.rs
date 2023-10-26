@@ -327,37 +327,33 @@ pub mod exec {
 
                         let buf = bit_depth_converter.convert(buf);
 
-                        writers.par_iter_mut().try_for_each(|writer| {
+                        writers.par_iter_mut().try_for_each(|writer_ref| {
 
                             if self.cancel.load(Ordering::SeqCst) {
                                 return None;
                             }
 
-                            // If we finish the stream or encounter an error,
-                            // we set the writer to None.
-                            // This prevents it from being reused (in error case),
-                            // and removes it from the final cleanup pass where
-                            // cancellations are handled.
-                            let mut drop_writer = false;
+                            let writer = std::mem::replace(writer_ref, None);
 
-                            if let &mut Some(ref mut writer) = writer {
+                            if let Some(mut writer) = writer {
+                                let mut handle_error = |writer, e| {
+                                    todo!();
+                                };
                                 if !buf.is_empty() {
                                     let res = writer.writer.write(buf);
                                     if let Err(e) = res {
-                                        todo!();
-                                        drop_writer = true;
+                                        handle_error(writer, e);
+                                    } else {
+                                        *writer_ref = Some(writer);
                                     }
                                 } else {
                                     let res = writer.writer.finalize();
                                     if let Err(e) = res {
-                                        todo!()
+                                        handle_error(writer, e);
+                                    } else {
+                                        todo!(); // rename file
                                     }
-                                    drop_writer = true;
                                 }
-                            }
-
-                            if drop_writer {
-                                *writer = None;
                             }
 
                             Some(())
