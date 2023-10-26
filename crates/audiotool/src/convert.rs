@@ -87,6 +87,8 @@ pub mod plan {
             let infile = entry.path();
             let outfiles = config.outputs_for(&infile).collect();
 
+            // todo check if outfile already exists
+
             outputs.push(InfilePlan {
                 infile: infile.to_owned(),
                 outfiles,
