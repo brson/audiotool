@@ -302,7 +302,19 @@ pub mod exec {
                         ),
                     ) = args;
 
-                    todo!();
+                    let buf = if !buf.is_empty() {
+                        let buf = sample_rate_converter.convert(&buf);
+                        if buf.is_empty() {
+                            // The SRC didn't produce any samples,
+                            // which might happen with short input and
+                            // reducing the sample rate.
+                            return Some(());
+                        } else {
+                            buf
+                        }
+                    } else {
+                        sample_rate_converter.finalize()
+                    };
 
                     bit_depths.par_iter_mut().try_for_each(|args| {
                         let (
@@ -313,7 +325,7 @@ pub mod exec {
                             ),
                         ) = args;
 
-                        todo!();
+                        let buf = bit_depth_converter.convert(buf);
 
                         writers.par_iter_mut().try_for_each(|writer| {
 
@@ -329,6 +341,10 @@ pub mod exec {
                 });
 
                 if keep_going.is_none() {
+                    break;
+                }
+
+                if buf.is_empty() {
                     break;
                 }
             }

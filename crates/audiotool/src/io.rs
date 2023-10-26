@@ -34,7 +34,7 @@ fn static_assertions(
 ) { }
 
 impl Buf {
-    fn is_empty(&self) -> bool {
+    pub fn is_empty(&self) -> bool {
         todo!()
     }
 }
