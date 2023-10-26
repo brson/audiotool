@@ -333,7 +333,32 @@ pub mod exec {
                                 return None;
                             }
 
-                            todo!();
+                            // If we finish the stream or encounter an error,
+                            // we set the writer to None.
+                            // This prevents it from being reused (in error case),
+                            // and removes it from the final cleanup pass where
+                            // cancellations are handled.
+                            let mut drop_writer = false;
+
+                            if let &mut Some(ref mut writer) = writer {
+                                if !buf.is_empty() {
+                                    let res = writer.writer.write(buf);
+                                    if let Err(e) = res {
+                                        todo!();
+                                        drop_writer = true;
+                                    }
+                                } else {
+                                    let res = writer.writer.finalize();
+                                    if let Err(e) = res {
+                                        todo!()
+                                    }
+                                    drop_writer = true;
+                                }
+                            }
+
+                            if drop_writer {
+                                *writer = None;
+                            }
 
                             Some(())
                         })
