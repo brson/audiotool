@@ -14,6 +14,7 @@ impl SampleFormat for F32 {
 #[derive(Serialize, Deserialize)]
 #[derive(Eq, PartialEq, Ord, PartialOrd)]
 #[derive(Copy, Clone)]
+#[derive(Debug)]
 pub struct Format {
     pub codec: Codec,
     pub bit_depth: BitDepth,
@@ -23,6 +24,7 @@ pub struct Format {
 #[derive(Serialize, Deserialize)]
 #[derive(Eq, PartialEq, Ord, PartialOrd)]
 #[derive(Copy, Clone)]
+#[derive(Debug)]
 pub enum Codec {
     Wav,
     Flac,
@@ -32,6 +34,7 @@ pub enum Codec {
 #[derive(Serialize, Deserialize)]
 #[derive(Eq, PartialEq, Ord, PartialOrd)]
 #[derive(Copy, Clone)]
+#[derive(Debug)]
 pub enum BitDepth {
     F32,
     I24,
@@ -41,6 +44,7 @@ pub enum BitDepth {
 #[derive(Serialize, Deserialize)]
 #[derive(Eq, PartialEq, Ord, PartialOrd)]
 #[derive(Copy, Clone)]
+#[derive(Debug)]
 pub enum SampleRate {
     K192,
     K48,

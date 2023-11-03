@@ -121,7 +121,7 @@ pub mod exec {
     }
 
     pub enum Response {
-        NextResult(AnyResult<ConvertResult>),
+        NextResult(ConvertResult),
         Done,
     }
 
@@ -129,6 +129,8 @@ pub mod exec {
     pub struct ConvertResult {
         pub in_path: PathBuf,
         pub out_path: PathBuf,
+        pub format: Format,
+        pub error: AnyResult<()>,
     }
 
     pub fn spawn(plan: Plan) -> (
@@ -224,6 +226,7 @@ pub mod exec {
     struct OutFileWriter {
         path: PathBuf,
         tmp_path: PathBuf,
+        format: Format,
         writer: Box<dyn PcmWriter>,
     }
 
@@ -267,6 +270,7 @@ pub mod exec {
                         Some(OutFileWriter {
                             path: outfile.path.clone(),
                             tmp_path: tmp_path.clone(),
+                            format: outfile.format,
                             writer: codecs::writer(&tmp_path, outfile.format),
                         })
                     }).collect();
@@ -367,7 +371,14 @@ pub mod exec {
                                     if let Err(e) = res {
                                         error!("error removing temp file while handling error");
                                     }
-                                    self.tx.send(Response::NextResult(Err(e)));
+                                    self.tx.send(Response::NextResult(
+                                        ConvertResult {
+                                            in_path: self.infile.to_owned(),
+                                            out_path: writer.path,
+                                            format: writer.format,
+                                            error: Err(e),
+                                        }
+                                    ));
                                 };
                                 if !buf.is_empty() {
                                     let res = writer.writer.write(buf);
@@ -381,6 +392,7 @@ pub mod exec {
                                     if let Err(e) = res {
                                         handle_error(writer, e);
                                     } else {
+                                        let format = writer.format;
                                         // Drop the writer so it closes any handles.
                                         // This might matter on windows.
                                         drop(writer.writer);
@@ -390,12 +402,14 @@ pub mod exec {
                                             handle_error(writer, e.into());
                                         } else {
                                             // success!
-                                            self.tx.send(Response::NextResult(Ok(
+                                            self.tx.send(Response::NextResult(
                                                 ConvertResult {
                                                     in_path: self.infile.to_owned(),
                                                     out_path: writer.path,
+                                                    format: writer.format,
+                                                    error: Ok(()),
                                                 }
-                                            )));
+                                            ));
                                         }
                                     }
                                 }
@@ -430,6 +444,14 @@ pub mod exec {
                                 match read_error.as_ref() {
                                     None => {
                                         todo!();
+                                        self.tx.send(Response::NextResult(
+                                            ConvertResult {
+                                                in_path: self.infile.to_owned(),
+                                                out_path: writer.path,
+                                                format: writer.format,
+                                                error: Err(anyhow!("cancelled")),
+                                            }
+                                        ));
                                     }
                                     Some(e) => {
                                         todo!();
