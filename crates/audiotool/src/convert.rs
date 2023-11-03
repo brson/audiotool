@@ -406,8 +406,6 @@ pub mod exec {
                 }
             }
 
-            // Fixme: do cleanups as part of normal traversal above;
-            // don't short-circuit traversal with try_for_each.
             // Do cleanups and send cancellation errors.
             for (_, (_, bit_depths)) in sample_rates.into_iter() {
                 for (_, (_, writers)) in bit_depths.into_iter() {
