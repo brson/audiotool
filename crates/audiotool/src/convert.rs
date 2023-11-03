@@ -343,6 +343,8 @@ pub mod exec {
 
                         writers.par_iter_mut().try_for_each(|writer_ref| {
 
+                            // todo: is it worth doing this check here?
+                            // we already did it in the outer loop.
                             if self.cancel.load(Ordering::SeqCst) {
                                 return None;
                             }
