@@ -294,6 +294,7 @@ pub mod exec {
             let mut sample_rates = self.converter_plan();
             let mut buf = Buf::Uninit;
             let mut reader = codecs::reader(&self.infile);
+            let mut read_error = None;
 
             loop {
                 if self.cancel.load(Ordering::SeqCst) {
@@ -302,10 +303,16 @@ pub mod exec {
 
                 match reader.read(&mut buf) {
                     Ok(()) => { },
-                    Err(_e) => {
-                        todo!()
+                    Err(e) => {
+                        read_error = Some(e);
+                        break;
                     }
                 }
+
+                // At this point `buf` either has data,
+                // or is empty if EOF. Even if EOF
+                // we may need to keep doing sample rate conversion
+                // to pick up the any remaining buffers in the SRC.
 
                 let keep_going = sample_rates.par_iter_mut().try_for_each(|args| {
                     let (
@@ -408,12 +415,27 @@ pub mod exec {
                 }
             }
 
-            // Do cleanups and send cancellation errors.
+            // Do cleanups and send cancellation / file read errors.
             for (_, (_, bit_depths)) in sample_rates.into_iter() {
                 for (_, (_, writers)) in bit_depths.into_iter() {
                     for writer in writers {
-                        if let Some(writer) = writer {
-                            todo!()
+                        match writer {
+                            None => {
+                                // The outfile has been completely handled,
+                                // either written, or an error.
+                            }
+                            Some(writer) => {
+                                // Conversion was cancelled or there was
+                                // an error reading the infile.
+                                match read_error.as_ref() {
+                                    None => {
+                                        todo!();
+                                    }
+                                    Some(e) => {
+                                        todo!();
+                                    }
+                                }
+                            }
                         }
                     }
                 }
