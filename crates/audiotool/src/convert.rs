@@ -197,11 +197,24 @@ pub mod exec {
     use crate::codecs;
     use super::OutFile;
 
+    type FormatPlan = BTreeMap<SampleRate, BTreeMap<BitDepth, Vec<OutFile>>>;
+    type ConverterPlan =
+        BTreeMap<
+            SampleRate, (
+                SampleRateConverter,
+                BTreeMap<
+                    BitDepth, (
+                        BitDepthConverter,
+                        Vec<Option<OutFileWriter>>
+                    )
+                >
+            )
+        >;
     struct FilePlan<'up> {
         cancel: &'up AtomicBool,
         tx: &'up SyncSender<Response>,
         infile: &'up Path,
-        sample_rates: BTreeMap<SampleRate, BTreeMap<BitDepth, Vec<OutFile>>>,
+        sample_rates: FormatPlan,
     }
 
     struct OutFileWriter {
@@ -232,56 +245,49 @@ pub mod exec {
             }
         }
 
-        fn run(&self) {
-            let mut sample_rates: BTreeMap<
-                    SampleRate,
-                (
-                    SampleRateConverter,
-                    BTreeMap<
-                            BitDepth,
-                        (
-                            BitDepthConverter,
-                            Vec<Option<OutFileWriter>>
-                        )>
-                )> = self.sample_rates.iter().map(|args| {
+        fn converter_plan(&self) -> ConverterPlan {
+            self.sample_rates.iter().map(|args| {
+                let (
+                    sample_rate,
+                    bit_depths,
+                ) = args;
+
+                let bit_depths = bit_depths.iter().map(|args| {
                     let (
-                        sample_rate,
-                        bit_depths,
+                        bit_depth,
+                        outfiles,
                     ) = args;
 
-                    let bit_depths = bit_depths.iter().map(|args| {
-                        let (
-                            bit_depth,
-                            outfiles,
-                        ) = args;
-
-                        let writers = outfiles.iter().map(|outfile| {
-                            let tmp_path = tmp_path(&outfile.path); 
-                            Some(OutFileWriter {
-                                path: outfile.path.clone(),
-                                tmp_path: tmp_path.clone(),
-                                writer: codecs::writer(&tmp_path, outfile.format),
-                            })
-                        }).collect();
-
-                        (
-                            *bit_depth,
-                            (
-                                BitDepthConverter,
-                                writers,
-                            ),
-                        )
+                    let writers = outfiles.iter().map(|outfile| {
+                        let tmp_path = tmp_path(&outfile.path); 
+                        Some(OutFileWriter {
+                            path: outfile.path.clone(),
+                            tmp_path: tmp_path.clone(),
+                            writer: codecs::writer(&tmp_path, outfile.format),
+                        })
                     }).collect();
 
                     (
-                        *sample_rate,
+                        *bit_depth,
                         (
-                            SampleRateConverter,
-                            bit_depths,
+                            BitDepthConverter,
+                            writers,
                         ),
                     )
                 }).collect();
 
+                (
+                    *sample_rate,
+                    (
+                        SampleRateConverter,
+                        bit_depths,
+                    ),
+                )
+            }).collect()
+        }
+
+        fn run(&self) {
+            let mut sample_rates = self.converter_plan();
             let mut buf = Buf::Uninit;
             let mut reader = codecs::reader(&self.infile);
 
