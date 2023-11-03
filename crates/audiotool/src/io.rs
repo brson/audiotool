@@ -35,6 +35,11 @@ fn static_assertions(
 
 impl Buf {
     pub fn is_empty(&self) -> bool {
-        todo!()
+        match self {
+            Buf::Uninit => true,
+            Buf::F32(v) => v.is_empty(),
+            Buf::I24(v) => v.is_empty(),
+            Buf::I16(v) => v.is_empty(),
+        }
     }
 }
