@@ -197,7 +197,11 @@ pub mod exec {
     use crate::codecs;
     use super::OutFile;
 
-    type FormatPlan = BTreeMap<SampleRate, BTreeMap<BitDepth, Vec<OutFile>>>;
+    type FormatPlan =
+        BTreeMap<
+            SampleRate,
+            BTreeMap<BitDepth, Vec<OutFile>>
+        >;
     type ConverterPlan =
         BTreeMap<
             SampleRate, (
