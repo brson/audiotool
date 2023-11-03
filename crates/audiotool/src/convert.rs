@@ -298,7 +298,7 @@ pub mod exec {
             let mut sample_rates = self.converter_plan();
             let mut buf = Buf::Uninit;
             let mut reader = codecs::reader(&self.infile);
-            let mut read_error = None;
+            let mut read_error = Ok(());
 
             loop {
                 if self.cancel.load(Ordering::SeqCst) {
@@ -308,7 +308,7 @@ pub mod exec {
                 match reader.read(&mut buf) {
                     Ok(()) => { },
                     Err(e) => {
-                        read_error = Some(e);
+                        read_error = Err(Arc::new(e));
                         break;
                     }
                 }
@@ -441,9 +441,18 @@ pub mod exec {
                             Some(writer) => {
                                 // Conversion was cancelled or there was
                                 // an error reading the infile.
+
+                                // Drop the writer so it closes any handles.
+                                // This might matter on windows.
+                                drop(writer.writer);
+
+                                let res = fs::remove_file(&writer.tmp_path);
+                                if let Err(e) = res {
+                                    error!("error removing temp file while handling error");
+                                }
+
                                 match read_error.as_ref() {
-                                    None => {
-                                        todo!();
+                                    Ok(()) => {
                                         self.tx.send(Response::NextResult(
                                             ConvertResult {
                                                 in_path: self.infile.to_owned(),
@@ -453,8 +462,16 @@ pub mod exec {
                                             }
                                         ));
                                     }
-                                    Some(e) => {
-                                        todo!();
+                                    Err(e) => {
+                                        self.tx.send(Response::NextResult(
+                                            ConvertResult {
+                                                in_path: self.infile.to_owned(),
+                                                out_path: writer.path,
+                                                format: writer.format,
+                                                // fixme: stringifying error
+                                                error: Err(anyhow!("{}", e).context("file read error")),
+                                            }
+                                        ));
                                     }
                                 }
                             }
