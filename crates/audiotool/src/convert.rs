@@ -187,6 +187,7 @@ pub mod exec {
         plan.run();
     }
 
+    use rx::prelude::*;
     use rx::rand::Rng;
     use crate::types::{Format, SampleRate, BitDepth};
     use std::collections::BTreeMap;
@@ -339,8 +340,15 @@ pub mod exec {
                             let writer = std::mem::replace(writer_ref, None);
 
                             if let Some(mut writer) = writer {
-                                let mut handle_error = |writer, e| {
-                                    todo!();
+                                let mut handle_error = |writer: OutFileWriter, e| {
+                                    // Drop the writer so it closes any handles.
+                                    // This might matter on windows.
+                                    drop(writer.writer);
+                                    let res = fs::remove_file(&writer.tmp_path);
+                                    if let Err(e) = res {
+                                        error!("error removing temp file while handling error");
+                                    }
+                                    self.tx.send(Response::NextResult(Err(e)));
                                 };
                                 if !buf.is_empty() {
                                     let res = writer.writer.write(buf);
@@ -355,10 +363,20 @@ pub mod exec {
                                         handle_error(writer, e);
                                     } else {
                                         // Drop the writer so it closes any handles.
+                                        // This might matter on windows.
                                         drop(writer.writer);
                                         let res = fs::rename(&writer.tmp_path, &writer.path);
                                         if let Err(e) = res {
-                                            todo!();
+                                            writer.writer = todo!();
+                                            handle_error(writer, e.into());
+                                        } else {
+                                            // success!
+                                            self.tx.send(Response::NextResult(Ok(
+                                                ConvertResult {
+                                                    in_path: self.infile.to_owned(),
+                                                    out_path: writer.path,
+                                                }
+                                            )));
                                         }
                                     }
                                 }
