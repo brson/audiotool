@@ -114,6 +114,7 @@ pub mod exec {
     use std::sync::atomic::{AtomicBool, Ordering};
     use std::thread;
     use std::path::{PathBuf, Path};
+    use std::fs;
 
     pub enum Request {
         Cancel,
@@ -353,7 +354,12 @@ pub mod exec {
                                     if let Err(e) = res {
                                         handle_error(writer, e);
                                     } else {
-                                        todo!(); // rename file
+                                        // Drop the writer so it closes any handles.
+                                        drop(writer.writer);
+                                        let res = fs::rename(&writer.tmp_path, &writer.path);
+                                        if let Err(e) = res {
+                                            todo!();
+                                        }
                                     }
                                 }
                             }
