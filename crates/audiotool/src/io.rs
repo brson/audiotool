@@ -43,3 +43,16 @@ impl Buf {
         }
     }
 }
+
+pub struct PanicPcmWriter;
+
+impl PcmWriter for PanicPcmWriter {
+    fn props(&self) -> AnyResult<Format> { panic!() }
+
+    fn write(
+        &mut self,
+        buf: &Buf,
+    ) -> AnyResult<()> { panic!() }
+
+    fn finalize(&mut self) -> AnyResult<()> { panic!() }
+}

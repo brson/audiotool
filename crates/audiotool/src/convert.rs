@@ -193,7 +193,7 @@ pub mod exec {
     use rx::rand::Rng;
     use crate::types::{Format, SampleRate, BitDepth};
     use std::collections::BTreeMap;
-    use crate::io::{PcmReader, PcmWriter, Buf};
+    use crate::io::{PcmReader, PcmWriter, PanicPcmWriter, Buf};
     use crate::samplerate::SampleRateConverter;
     use crate::bitdepth::BitDepthConverter;
     use crate::codecs;
@@ -398,7 +398,7 @@ pub mod exec {
                                         drop(writer.writer);
                                         let res = fs::rename(&writer.tmp_path, &writer.path);
                                         if let Err(e) = res {
-                                            writer.writer = todo!();
+                                            writer.writer = Box::new(PanicPcmWriter);
                                             handle_error(writer, e.into());
                                         } else {
                                             // success!
@@ -468,7 +468,7 @@ pub mod exec {
                                                 in_path: self.infile.to_owned(),
                                                 out_path: writer.path,
                                                 format: writer.format,
-                                                // fixme: stringifying error
+                                                // fixme: don't stringify this error
                                                 error: Err(anyhow!("{}", e).context("file read error")),
                                             }
                                         ));
