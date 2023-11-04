@@ -512,9 +512,21 @@ impl Config {
     fn outputs_for<'s>(&'s self, path: &'s Path) -> impl Iterator<Item = OutFile> + 's {
         self.formats.iter().copied().map(|format| {
             OutFile {
-                path: todo!(),
+                path: self.outfile_for(path, format),
                 format,
             }
         })
+    }
+
+    fn outfile_for(&self, path: &Path, format: Format) -> PathBuf {
+        struct OutPathVars {
+            out_root_dir: PathBuf,
+            relative_path: PathBuf,
+            file_stem: String,
+            format_ext: String,
+            format_name: String,
+        }
+
+        todo!()
     }
 }
