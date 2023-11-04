@@ -360,8 +360,13 @@ pub mod exec {
                                 return None;
                             }
 
+                            // If there is any error writing the file we will
+                            // handle it now, and set the writer to `None` for
+                            // future iterations.
                             let writer = std::mem::replace(writer_ref, None);
 
+                            // If the writer is `None` then there was an error
+                            // previously.
                             if let Some(mut writer) = writer {
                                 let mut handle_error = |writer: OutFileWriter, e| {
                                     // Drop the writer so it closes any handles.
