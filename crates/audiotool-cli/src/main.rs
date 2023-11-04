@@ -5,9 +5,11 @@ use std::fs;
 
 mod convert;
 mod split;
+mod ctrlc;
 
 fn main() -> AnyResult<()> {
     rx::extras::init();
+    ctrlc::init();
 
     let cli = Cli::parse();
     cli.run()?;
