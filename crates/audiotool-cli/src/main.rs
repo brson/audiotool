@@ -90,6 +90,9 @@ impl ConvertCommand {
                 cvt::exec::Response::Done => {
                     break;
                 }
+                cvt::exec::Response::Cancelled => {
+                    break;
+                }
             }
         }
 

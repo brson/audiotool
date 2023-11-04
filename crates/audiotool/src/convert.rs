@@ -123,6 +123,7 @@ pub mod exec {
     pub enum Response {
         NextResult(ConvertResult),
         Done,
+        Cancelled,
     }
 
     #[derive(Debug)]
@@ -172,7 +173,11 @@ pub mod exec {
             convert_file(infile_plan, &tx, &cancel);
         });
 
-        let _ = tx.send(Response::Done);
+        if !cancel.load(Ordering::SeqCst) {
+            let _ = tx.send(Response::Done);
+        } else {
+            let _ = tx.send(Response::Cancelled);
+        }
     }
 
     fn convert_file(
