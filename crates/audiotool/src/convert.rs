@@ -503,7 +503,7 @@ pub mod exec {
     }
 }
 
-use crate::types::Format;
+use crate::types::{Format, Codec};
 use self::config::Config;
 use std::path::{Path, PathBuf};
 
@@ -529,8 +529,22 @@ impl Config {
             relative_path: PathBuf,
             file_stem: String,
             format_ext: String,
-            format_name: String,
         }
+
+        let outpath_vars = OutPathVars {
+            out_root_dir: self.out_root_dir.clone(),
+            relative_path: todo!(),
+            file_stem: if let Some(file_stem) = path.file_stem() {
+                todo!()
+            } else {
+                todo!()
+            },
+            format_ext: match format.codec {
+                Codec::Wav => "wav",
+                Codec::Flac => "flac",
+                Codec::Vorbis => "ogg",
+            }.to_string(),
+        };
 
         todo!()
     }
