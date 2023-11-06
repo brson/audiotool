@@ -535,11 +535,13 @@ impl Config {
 
         let outpath_vars = OutPathVars {
             out_root_dir: self.out_root_dir.clone(),
-            relative_path: todo!(),
+            relative_path: path.strip_prefix(&self.reference_tracks_dir)?.to_owned(),
             file_stem: if let Some(file_stem) = path.file_stem() {
-                todo!()
+                file_stem.to_str().ok_or_else(|| {
+                    anyhow!("can't convert file stem to UTF-8")
+                })?.to_string()
             } else {
-                todo!()
+                bail!("no file stem")
             },
             format_ext: match format.codec {
                 Codec::Wav => "wav",
