@@ -85,7 +85,8 @@ pub mod plan {
 
             let entry = entry?;
             let infile = entry.path();
-            let outfiles = config.outputs_for(&infile).collect();
+            let outfiles: AnyResult<Vec<_>> = config.outputs_for(&infile).collect();
+            let outfiles = outfiles?;
 
             // todo check if outfile already exists
 
@@ -506,6 +507,7 @@ pub mod exec {
 use crate::types::{Format, Codec};
 use self::config::Config;
 use std::path::{Path, PathBuf};
+use rx::prelude::*;
 
 #[derive(Clone)]
 pub struct OutFile {
@@ -514,16 +516,16 @@ pub struct OutFile {
 }
 
 impl Config {
-    fn outputs_for<'s>(&'s self, path: &'s Path) -> impl Iterator<Item = OutFile> + 's {
+    fn outputs_for<'s>(&'s self, path: &'s Path) -> impl Iterator<Item = AnyResult<OutFile>> + 's {
         self.formats.iter().copied().map(|format| {
-            OutFile {
-                path: self.outfile_for(path, format),
+            Ok(OutFile {
+                path: self.outfile_for(path, format)?,
                 format,
-            }
+            })
         })
     }
 
-    fn outfile_for(&self, path: &Path, format: Format) -> PathBuf {
+    fn outfile_for(&self, path: &Path, format: Format) -> AnyResult<PathBuf> {
         struct OutPathVars {
             out_root_dir: PathBuf,
             relative_path: PathBuf,
