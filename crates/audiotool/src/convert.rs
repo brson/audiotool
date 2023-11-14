@@ -508,6 +508,8 @@ use crate::types::{Format, Codec};
 use self::config::Config;
 use std::path::{Path, PathBuf};
 use rx::prelude::*;
+use rx::tera::{Tera, Context as TeraContext};
+use rx::serde::Serialize;
 
 #[derive(Clone)]
 pub struct OutFile {
@@ -526,6 +528,7 @@ impl Config {
     }
 
     fn outfile_for(&self, path: &Path, format: Format) -> AnyResult<PathBuf> {
+        #[derive(Serialize)]
         struct OutPathVars {
             out_root_dir: PathBuf,
             relative_path: PathBuf,
@@ -550,6 +553,12 @@ impl Config {
             }.to_string(),
         };
 
-        todo!()
+        let mut tera = Tera::default();
+        tera.add_raw_template("template", &self.out_path_template)?;
+
+        let context = TeraContext::from_serialize(&outpath_vars)?;
+        let path = tera.render("template", &context)?;
+
+        Ok(PathBuf::from(path))
     }
 }
