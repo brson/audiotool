@@ -1,9 +1,21 @@
 use std::path::Path;
 use crate::io::*;
 use crate::types::*;
+use std::ffi::OsStr;
 
 pub fn reader(path: &Path) -> Box<dyn PcmReader> {
-    todo!()
+    let ext = path.extension()
+        .map(OsStr::to_string_lossy)
+        .as_deref()
+        .map(str::to_string);
+    match ext.as_deref() {
+        Some("wav") => {
+            todo!()
+        }
+        _ => {
+            todo!()
+        }
+    }
 }
 
 pub fn writer(path: &Path, format: Format) -> Box<dyn PcmWriter> {
