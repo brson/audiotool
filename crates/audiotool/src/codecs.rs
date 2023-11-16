@@ -10,7 +10,7 @@ pub fn reader(path: &Path) -> Box<dyn PcmReader> {
         .map(str::to_string);
     match ext.as_deref() {
         Some("wav") => {
-            todo!()
+            Box::new(wav::WavPcmReader::new(path))
         }
         _ => {
             todo!()
@@ -21,7 +21,7 @@ pub fn reader(path: &Path) -> Box<dyn PcmReader> {
 pub fn writer(path: &Path, format: Format) -> Box<dyn PcmWriter> {
     match format.codec {
         Codec::Wav => {
-            todo!()
+            Box::new(wav::WavPcmWriter::new(path, format.bit_depth, format.sample_rate))
         }
         Codec::Flac => {
             todo!()
@@ -34,10 +34,17 @@ pub fn writer(path: &Path, format: Format) -> Box<dyn PcmWriter> {
 
 pub mod wav {
     use rx::prelude::*;
-    use crate::types::Format;
+    use crate::types::{Format, BitDepth, SampleRate};
     use crate::io::{PcmReader, PcmWriter, Buf};
+    use std::path::Path;
 
     pub struct WavPcmReader {
+    }
+
+    impl WavPcmReader {
+        pub fn new(path: &Path) -> WavPcmReader {
+            todo!()
+        }
     }
 
     impl PcmReader for WavPcmReader {
@@ -54,6 +61,16 @@ pub mod wav {
     }
 
     pub struct WavPcmWriter {
+    }
+
+    impl WavPcmWriter {
+        pub fn new(
+            path: &Path,
+            bit_depth: BitDepth,
+            sample_rate: SampleRate,
+        ) -> WavPcmWriter {
+            todo!()
+        }
     }
 
     impl PcmWriter for WavPcmWriter {
