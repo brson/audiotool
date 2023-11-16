@@ -7,10 +7,59 @@ pub fn reader(path: &Path) -> Box<dyn PcmReader> {
 }
 
 pub fn writer(path: &Path, format: Format) -> Box<dyn PcmWriter> {
-    todo!()
+    match format.codec {
+        Codec::Wav => {
+            todo!()
+        }
+        Codec::Flac => {
+            todo!()
+        }
+        Codec::Vorbis => {
+            todo!()
+        }
+    }
 }
 
 pub mod wav {
+    use rx::prelude::*;
+    use crate::types::Format;
+    use crate::io::{PcmReader, PcmWriter, Buf};
+
+    pub struct WavPcmReader {
+    }
+
+    impl PcmReader for WavPcmReader {
+        fn props(&mut self) -> AnyResult<Format> {
+            todo!()
+        }
+
+        fn read(
+            &mut self,
+            buf: &mut Buf,
+        ) -> AnyResult<()> {
+            todo!()
+        }
+    }
+
+    pub struct WavPcmWriter {
+    }
+
+    impl PcmWriter for WavPcmWriter {
+        fn props(&self) -> AnyResult<Format> {
+            todo!()
+        }
+
+        fn write(
+            &mut self,
+            buf: &Buf,
+        ) -> AnyResult<()> {
+            todo!()
+        }
+
+        fn finalize(&mut self) -> AnyResult<()> {
+            todo!()
+        }
+    }
 }
 
 pub mod flac {
