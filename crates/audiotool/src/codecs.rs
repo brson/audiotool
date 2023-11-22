@@ -18,10 +18,14 @@ pub fn reader(path: &Path) -> Box<dyn PcmReader> {
     }
 }
 
-pub fn writer(path: &Path, format: Format) -> Box<dyn PcmWriter> {
+pub fn writer(
+    path: &Path,
+    channels: u16,
+    format: Format
+) -> Box<dyn PcmWriter> {
     match format.codec {
         Codec::Wav => {
-            Box::new(wav::WavPcmWriter::new(path, format.bit_depth, format.sample_rate))
+            Box::new(wav::WavPcmWriter::new(path, channels, format.bit_depth, format.sample_rate))
         }
         Codec::Flac => {
             todo!()
@@ -72,6 +76,7 @@ pub mod wav {
     impl WavPcmWriter {
         pub fn new(
             path: &Path,
+            channels: u16,
             bit_depth: BitDepth,
             sample_rate: SampleRate,
         ) -> WavPcmWriter {
