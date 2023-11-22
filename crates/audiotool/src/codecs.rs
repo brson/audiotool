@@ -46,7 +46,9 @@ pub mod wav {
 
     impl WavPcmReader {
         pub fn new(path: &Path) -> WavPcmReader {
-            todo!()
+            WavPcmReader {
+                reader: hound::WavReader::open(path),
+            }
         }
     }
 
