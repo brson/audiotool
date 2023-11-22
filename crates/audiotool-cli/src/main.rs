@@ -29,6 +29,7 @@ struct Cli {
 #[derive(clap::Subcommand)]
 enum Command {
     Convert(ConvertCommand),
+    Template(TemplateCommand),
 }
 
 #[derive(clap::Args)]
@@ -40,10 +41,16 @@ struct ConvertCommand {
     config: PathBuf,
 }
 
+#[derive(clap::Args)]
+struct TemplateCommand {
+    config: PathBuf,
+}
+
 impl Cli {
     fn run(&self) -> AnyResult<()> {
         match &self.cmd {
             Command::Convert(cmd) => cmd.run(&self.args),
+            Command::Template(cmd) => cmd.run(&self.args),
         }
     }
 }
@@ -95,6 +102,19 @@ impl ConvertCommand {
                 }
             }
         }
+
+        Ok(())
+    }
+}
+
+impl TemplateCommand {
+    fn run(&self, _args: &Args) -> AnyResult<()> {
+        use audiotool::convert as cvt;
+
+        let config = cvt::config::Config::template();
+        let config = rx::toml::to_string(&config)?;
+
+        fs::write(&self.config, &config)?;
 
         Ok(())
     }

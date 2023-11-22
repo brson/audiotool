@@ -1,7 +1,8 @@
 pub mod config {
+    use rx::prelude::*;
     use std::path::PathBuf;
     use rx::serde::{Serialize, Deserialize};
-    use crate::types::{Format};
+    use crate::types::{Format, Codec, BitDepth, SampleRate};
 
     #[derive(Serialize, Deserialize)]
     #[derive(Clone)]
@@ -11,6 +12,24 @@ pub mod config {
         pub out_root_dir: PathBuf,
         pub out_path_template: String,
         pub formats: Vec<Format>,
+    }
+
+    impl Config {
+        pub fn template() -> Config {
+            Config {
+                reference_tracks_dir: S!("./in/").into(),
+                reference_track_regex: S!("\\.wav"),
+                out_root_dir: S!("./out/").into(),
+                out_path_template: S!("{{out_root_dir}}/{{relative_path}}/{{file_stem}}.{{format_ext}}"),
+                formats: vec![
+                    Format {
+                        codec: Codec::Wav,
+                        bit_depth: BitDepth::I24,
+                        sample_rate: SampleRate::K48,
+                    },
+                ]
+            }
+        }
     }
 }
 
