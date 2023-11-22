@@ -35,7 +35,7 @@ pub fn writer(path: &Path, format: Format) -> Box<dyn PcmWriter> {
 pub mod wav {
     use rx::prelude::*;
     use crate::types::{Format, BitDepth, SampleRate};
-    use crate::io::{PcmReader, PcmWriter, Buf};
+    use crate::io::{PcmReader, PcmWriter, Buf, Props};
     use std::path::Path;
     use std::io::{BufReader, BufWriter};
     use std::fs::File;
@@ -53,7 +53,7 @@ pub mod wav {
     }
 
     impl PcmReader for WavPcmReader {
-        fn props(&mut self) -> AnyResult<Format> {
+        fn props(&mut self) -> AnyResult<Props> {
             todo!()
         }
 
@@ -80,7 +80,7 @@ pub mod wav {
     }
 
     impl PcmWriter for WavPcmWriter {
-        fn props(&self) -> AnyResult<Format> {
+        fn props(&self) -> AnyResult<Props> {
             todo!()
         }
 

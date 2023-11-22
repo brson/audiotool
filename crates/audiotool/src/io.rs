@@ -8,8 +8,13 @@ pub enum Buf {
     I16(Vec<i16>),
 }
 
+pub struct Props {
+    pub channels: u16,
+    pub format: Format,
+}
+
 pub trait PcmReader: Send {
-    fn props(&mut self) -> AnyResult<Format>;
+    fn props(&mut self) -> AnyResult<Props>;
 
     fn read(
         &mut self,
@@ -18,7 +23,7 @@ pub trait PcmReader: Send {
 }
 
 pub trait PcmWriter: Send {
-    fn props(&self) -> AnyResult<Format>;
+    fn props(&self) -> AnyResult<Props>;
 
     fn write(
         &mut self,
@@ -47,7 +52,7 @@ impl Buf {
 pub struct PanicPcmWriter;
 
 impl PcmWriter for PanicPcmWriter {
-    fn props(&self) -> AnyResult<Format> { panic!() }
+    fn props(&self) -> AnyResult<Props> { panic!() }
 
     fn write(
         &mut self,
