@@ -37,8 +37,11 @@ pub mod wav {
     use crate::types::{Format, BitDepth, SampleRate};
     use crate::io::{PcmReader, PcmWriter, Buf};
     use std::path::Path;
+    use std::io::{BufReader, BufWriter};
+    use std::fs::File;
 
     pub struct WavPcmReader {
+        reader: hound::Result<hound::WavReader<BufReader<File>>>,
     }
 
     impl WavPcmReader {
@@ -61,6 +64,7 @@ pub mod wav {
     }
 
     pub struct WavPcmWriter {
+        writer: hound::Result<hound::WavWriter<BufWriter<File>>>,
     }
 
     impl WavPcmWriter {
