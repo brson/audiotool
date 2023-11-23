@@ -277,7 +277,7 @@ pub mod exec {
             }
         }
 
-        fn converter_plan(&self) -> ConverterPlan {
+        fn converter_plan(&self, channels: &AnyResult<u16>) -> ConverterPlan {
             self.sample_rates.iter().map(|args| {
                 let (
                     sample_rate,
@@ -296,7 +296,14 @@ pub mod exec {
                             path: outfile.path.clone(),
                             tmp_path: tmp_path.clone(),
                             format: outfile.format,
-                            writer: codecs::writer(&tmp_path, todo!(), outfile.format),
+                            writer: match channels {
+                                Ok(channels) => {
+                                    codecs::writer(&tmp_path, *channels, outfile.format)
+                                }
+                                Err(_) => {
+                                    Box::new(crate::io::PanicPcmWriter)
+                                }
+                            },
                         })
                     }).collect();
 
@@ -320,12 +327,17 @@ pub mod exec {
         }
 
         fn run(&self) {
-            let mut sample_rates = self.converter_plan();
-            let mut buf = Buf::Uninit;
             let mut reader = codecs::reader(&self.infile);
-            let mut read_error = Ok(());
+            let channels = reader.props().map(|p| p.channels);
+            let mut sample_rates = self.converter_plan(&channels);
+            let mut buf = Buf::Uninit;
+            let mut read_error = channels.map(|_| ()).map_err(Arc::new);
 
             loop {
+                if read_error.is_err() {
+                    break;
+                }
+
                 if self.cancel.load(Ordering::SeqCst) {
                     break;
                 }
@@ -478,7 +490,9 @@ pub mod exec {
 
                                 let res = fs::remove_file(&writer.tmp_path);
                                 if let Err(e) = res {
-                                    error!("error removing temp file while handling error");
+                                    if e.kind() != std::io::ErrorKind::NotFound {
+                                        error!("error removing temp file while handling error");
+                                    }
                                 }
 
                                 match read_error.as_ref() {
