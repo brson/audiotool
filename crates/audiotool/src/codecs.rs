@@ -81,7 +81,15 @@ pub mod wav {
             bit_depth: BitDepth,
             sample_rate: SampleRate,
         ) -> WavPcmWriter {
-            todo!()
+            let spec = hound::WavSpec {
+                channels,
+                sample_rate: todo!(),
+                bits_per_sample: todo!(),
+                sample_format: todo!(),
+            };
+            WavPcmWriter {
+                writer: hound::WavWriter::create(path, spec),
+            }
         }
     }
 
