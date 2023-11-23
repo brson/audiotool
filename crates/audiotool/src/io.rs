@@ -23,8 +23,6 @@ pub trait PcmReader: Send {
 }
 
 pub trait PcmWriter: Send {
-    fn props(&self) -> AnyResult<Props>;
-
     fn write(
         &mut self,
         buf: &Buf,
@@ -52,8 +50,6 @@ impl Buf {
 pub struct PanicPcmWriter;
 
 impl PcmWriter for PanicPcmWriter {
-    fn props(&self) -> AnyResult<Props> { panic!() }
-
     fn write(
         &mut self,
         buf: &Buf,

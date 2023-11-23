@@ -105,10 +105,6 @@ pub mod wav {
     }
 
     impl PcmWriter for WavPcmWriter {
-        fn props(&self) -> AnyResult<Props> {
-            todo!()
-        }
-
         fn write(
             &mut self,
             buf: &Buf,
