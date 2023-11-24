@@ -148,7 +148,7 @@ pub mod wav {
     }
 
     pub struct WavPcmWriter {
-        writer: hound::Result<hound::WavWriter<BufWriter<File>>>,
+        writer: Option<hound::Result<hound::WavWriter<BufWriter<File>>>>,
     }
 
     impl WavPcmWriter {
@@ -176,7 +176,7 @@ pub mod wav {
                 },
             };
             WavPcmWriter {
-                writer: hound::WavWriter::create(path, spec),
+                writer: Some(hound::WavWriter::create(path, spec)),
             }
         }
     }
@@ -190,7 +190,18 @@ pub mod wav {
         }
 
         fn finalize(&mut self) -> AnyResult<()> {
-            todo!()
+            let writer = std::mem::replace(&mut self.writer, None);
+            match writer {
+                Some(writer) => {
+                    let writer = writer
+                        .map_err(|e| anyhow!("{e}"))?;
+                    writer.finalize()?;
+                    Ok(())
+                }
+                None => {
+                    panic!("already finalized");
+                }
+            }
         }
     }
 }
