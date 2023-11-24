@@ -59,7 +59,7 @@ impl PcmWriter for PanicPcmWriter {
 }
 
 impl Buf {
-    fn f32_mut(&mut self) -> &mut Vec<f32> {
+    pub fn f32_mut(&mut self) -> &mut Vec<f32> {
         match self {
             Buf::F32(buf) => buf,
             _ => {
@@ -69,7 +69,7 @@ impl Buf {
         }
     }
 
-    fn i24_mut(&mut self) -> &mut Vec<i32> {
+    pub fn i24_mut(&mut self) -> &mut Vec<i32> {
         match self {
             Buf::I24(buf) => buf,
             _ => {
@@ -79,7 +79,7 @@ impl Buf {
         }
     }
 
-    fn i16_mut(&mut self) -> &mut Vec<i16> {
+    pub fn i16_mut(&mut self) -> &mut Vec<i16> {
         match self {
             Buf::I16(buf) => buf,
             _ => {

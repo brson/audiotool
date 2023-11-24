@@ -85,12 +85,27 @@ pub mod wav {
             &mut self,
             buf: &mut Buf,
         ) -> AnyResult<()> {
-            let reader = self.reader.as_ref()
-                .map_err(|e| anyhow!("{e}"))?;
             let props = self.props()?;
+            let reader = self.reader.as_mut()
+                .map_err(|e| anyhow!("{e}"))?;
             match props.format.bit_depth {
                 BitDepth::F32 => {
-                    todo!()
+                    let bytes_to_read = 4096 * props.channels as usize;
+                    let mut buf = buf.f32_mut();
+                    buf.truncate(0);
+                    buf.reserve_exact(bytes_to_read);
+                    let mut samples = reader.samples::<f32>();
+                    for _ in 0..bytes_to_read {
+                        match samples.next() {
+                            Some(sample) => {
+                                buf.push(sample?);
+                            }
+                            None => {
+                                break;
+                            }
+                        }
+                    }
+                    Ok(())
                 }
                 BitDepth::I24 => {
                     todo!()
