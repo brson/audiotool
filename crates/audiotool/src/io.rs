@@ -57,3 +57,35 @@ impl PcmWriter for PanicPcmWriter {
 
     fn finalize(&mut self) -> AnyResult<()> { panic!() }
 }
+
+impl Buf {
+    fn f32_mut(&mut self) -> &mut Vec<f32> {
+        match self {
+            Buf::F32(buf) => buf,
+            _ => {
+                *self = Buf::F32(vec![]);
+                self.f32_mut()
+            }
+        }
+    }
+
+    fn i24_mut(&mut self) -> &mut Vec<i32> {
+        match self {
+            Buf::I24(buf) => buf,
+            _ => {
+                *self = Buf::I24(vec![]);
+                self.i24_mut()
+            }
+        }
+    }
+
+    fn i16_mut(&mut self) -> &mut Vec<i16> {
+        match self {
+            Buf::I16(buf) => buf,
+            _ => {
+                *self = Buf::I16(vec![]);
+                self.i16_mut()
+            }
+        }
+    }
+}

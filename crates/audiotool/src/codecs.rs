@@ -85,7 +85,20 @@ pub mod wav {
             &mut self,
             buf: &mut Buf,
         ) -> AnyResult<()> {
-            todo!()
+            let reader = self.reader.as_ref()
+                .map_err(|e| anyhow!("{e}"))?;
+            let props = self.props()?;
+            match props.format.bit_depth {
+                BitDepth::F32 => {
+                    todo!()
+                }
+                BitDepth::I24 => {
+                    todo!()
+                }
+                BitDepth::I16 => {
+                    todo!()
+                }
+            }            
         }
     }
 
