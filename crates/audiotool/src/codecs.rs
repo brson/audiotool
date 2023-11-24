@@ -39,7 +39,7 @@ pub fn writer(
 
 pub mod wav {
     use rx::prelude::*;
-    use crate::types::{Format, BitDepth, SampleRate};
+    use crate::types::{Format, BitDepth, SampleRate, Codec};
     use crate::io::{PcmReader, PcmWriter, Buf, Props};
     use std::path::Path;
     use std::io::{BufReader, BufWriter};
@@ -59,7 +59,26 @@ pub mod wav {
 
     impl PcmReader for WavPcmReader {
         fn props(&mut self) -> AnyResult<Props> {
-            todo!()
+            let reader = self.reader.as_ref()
+                .map_err(|e| anyhow!("{e}"))?;
+            let spec = reader.spec();
+            Ok(Props {
+                channels: spec.channels,
+                format: Format {
+                    codec: Codec::Wav,
+                    bit_depth: match (spec.bits_per_sample, spec.sample_format) {
+                        (32, hound::SampleFormat::Float) => BitDepth::F32,
+                        (24, hound::SampleFormat::Int) => BitDepth::I24,
+                        (16, hound::SampleFormat::Int) => BitDepth::I16,
+                        (bits, format) => bail!("unsupported sample format: {bits}/{format:?}"),
+                    },
+                    sample_rate: match spec.sample_rate {
+                        48_000 => SampleRate::K48,
+                        192_000 => SampleRate::K192,
+                        r => bail!("unsupported sample rate: {r} hz"),
+                    }
+                }
+            })
         }
 
         fn read(
