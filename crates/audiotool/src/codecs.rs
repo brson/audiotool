@@ -186,7 +186,34 @@ pub mod wav {
             &mut self,
             buf: &Buf,
         ) -> AnyResult<()> {
-            todo!()
+            match &mut self.writer {
+                Some(writer) => {
+                    let writer = writer.as_mut()
+                        .map_err(|e| anyhow!("{e}"))?;
+                    match buf {
+                        Buf::F32(buf) => {
+                            for sample in buf.iter().copied() {
+                                writer.write_sample(sample)?;
+                            }
+                        }
+                        Buf::I24(buf) => {
+                            for sample in buf.iter().copied() {
+                                writer.write_sample(sample)?;
+                            }
+                        }
+                        Buf::I16(buf) => {
+                            for sample in buf.iter().copied() {
+                                writer.write_sample(sample)?;
+                            }
+                        }
+                        Buf::Uninit => panic!(),
+                    }
+                    Ok(())
+                }
+                None => {
+                    panic!("already finalized");
+                }
+            }
         }
 
         fn finalize(&mut self) -> AnyResult<()> {
