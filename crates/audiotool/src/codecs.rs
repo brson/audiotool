@@ -108,10 +108,40 @@ pub mod wav {
                     Ok(())
                 }
                 BitDepth::I24 => {
-                    todo!()
+                    let bytes_to_read = 4096 * props.channels as usize;
+                    let mut buf = buf.i24_mut();
+                    buf.truncate(0);
+                    buf.reserve_exact(bytes_to_read);
+                    let mut samples = reader.samples::<i32>();
+                    for _ in 0..bytes_to_read {
+                        match samples.next() {
+                            Some(sample) => {
+                                buf.push(sample?);
+                            }
+                            None => {
+                                break;
+                            }
+                        }
+                    }
+                    Ok(())
                 }
                 BitDepth::I16 => {
-                    todo!()
+                    let bytes_to_read = 4096 * props.channels as usize;
+                    let mut buf = buf.i16_mut();
+                    buf.truncate(0);
+                    buf.reserve_exact(bytes_to_read);
+                    let mut samples = reader.samples::<i16>();
+                    for _ in 0..bytes_to_read {
+                        match samples.next() {
+                            Some(sample) => {
+                                buf.push(sample?);
+                            }
+                            None => {
+                                break;
+                            }
+                        }
+                    }
+                    Ok(())
                 }
             }            
         }
