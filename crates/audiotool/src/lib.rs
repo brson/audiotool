@@ -32,12 +32,31 @@ pub mod bitdepth {
     use crate::io::Buf;
 
     pub struct BitDepthConverter {
+        inbits: BitDepth,
+        outbits: BitDepth,
         dither: bool,
     }
 
     impl BitDepthConverter {
         pub fn new(inbits: BitDepth, outbits: BitDepth, origbits: BitDepth) -> BitDepthConverter {
-            todo!()
+            let dither = match (inbits, outbits, origbits) {
+                (BitDepth::F32, BitDepth::F32, BitDepth::F32) => false,
+                (BitDepth::F32, BitDepth::I24, BitDepth::F32) => false,
+                (BitDepth::F32, BitDepth::I16, BitDepth::F32) => false,
+                (BitDepth::F32, BitDepth::F32, BitDepth::I24) => false,
+                (BitDepth::F32, BitDepth::I24, BitDepth::I24) => false,
+                (BitDepth::F32, BitDepth::I16, BitDepth::I24) => true,
+                (BitDepth::F32, BitDepth::F32, BitDepth::I16) => false,
+                (BitDepth::F32, BitDepth::I24, BitDepth::I16) => false,
+                (BitDepth::F32, BitDepth::I16, BitDepth::I16) => false,
+                (_, _, _) => {
+                    todo!()
+                }
+            };
+
+            BitDepthConverter {
+                inbits, outbits, dither,
+            }
         }
 
         pub fn convert(&mut self, inbuf: &Buf) -> &Buf {
