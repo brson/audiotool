@@ -277,7 +277,7 @@ pub mod exec {
             }
         }
 
-        fn converter_plan(&self, source_props: &AnyResult<Props>) -> ConverterPlan {
+        fn converter_plan(&self, source_props: &Props) -> ConverterPlan {
             self.sample_rates.iter().map(|args| {
                 let (
                     sample_rate,
@@ -296,14 +296,7 @@ pub mod exec {
                             path: outfile.path.clone(),
                             tmp_path: tmp_path.clone(),
                             format: outfile.format,
-                            writer: match source_props {
-                                Ok(source_props) => {
-                                    codecs::writer(&tmp_path, source_props.channels, outfile.format)
-                                }
-                                Err(_) => {
-                                    Box::new(crate::io::PanicPcmWriter)
-                                }
-                            },
+                            writer: codecs::writer(&tmp_path, source_props.channels, outfile.format),
                         })
                     }).collect();
 
@@ -313,10 +306,7 @@ pub mod exec {
                             BitDepthConverter::new(
                                 BitDepth::F32,
                                 *bit_depth,
-                                match source_props {
-                                    Ok(source_props) => source_props.format.bit_depth,
-                                    Err(_) => BitDepth::F32,
-                                }
+                                source_props.format.bit_depth,
                             ),
                             writers,
                         ),
@@ -327,10 +317,7 @@ pub mod exec {
                     *sample_rate,
                     (
                         SampleRateConverter::new(
-                            match source_props {
-                                Ok(source_props) => source_props.format.sample_rate,
-                                Err(_) => SampleRate::K48,
-                            },
+                            source_props.format.sample_rate,
                             *sample_rate,
                         ),
                         bit_depths,
@@ -339,59 +326,43 @@ pub mod exec {
             }).collect()
         }
 
-        fn run(&self) {
+        fn prepare(&self) -> AnyResult<(
+            Box<dyn PcmReader>,
+            ConverterPlan,
+            BitDepthConverter,
+        )> {
+            let mut reader = codecs::reader(&self.infile)?;
+            let source_props = reader.props()?;
+            let mut sample_rates = self.converter_plan(&source_props);
+            let mut f32_converter = BitDepthConverter::new(
+                source_props.format.bit_depth,
+                BitDepth::F32,
+                source_props.format.bit_depth,
+            );
 
+            Ok((reader, sample_rates, f32_converter))
+        }
+            
+
+        fn run(&self) {
             let (
                 mut reader,
                 mut sample_rates,
                 mut f32_converter,
-                mut read_error,
-            ) = {
-                match codecs::reader(&self.infile) {
-                    Ok(mut reader) => {
-                        let source_props = reader.props();
-                        let mut sample_rates = self.converter_plan(&source_props);
-                        let mut f32_converter = match source_props.as_ref() {
-                            Ok(source_props) => {
-                                BitDepthConverter::new(
-                                    source_props.format.bit_depth,
-                                    BitDepth::F32,
-                                    source_props.format.bit_depth,
-                                )
-                            }
-                            Err(_) => {
-                                BitDepthConverter::new(
-                                    BitDepth::F32, BitDepth::F32, BitDepth::F32
-                                )
-                            }
-                        };
-                        let read_error = source_props.map(|_| ()).map_err(Arc::new);
-
-                        (Some(reader), sample_rates, f32_converter, read_error)
-                    }
-                    reader @ Err(_) => {
-                        let mut sample_rates = self.converter_plan(&Err(anyhow!("placeholder")));
-                        let mut f32_converter = BitDepthConverter::new(
-                            BitDepth::F32, BitDepth::F32, BitDepth::F32
-                        );
-                        let read_error = reader.map(|_| ()).map_err(|e| Arc::new(e));
-
-                        (None, sample_rates, f32_converter, read_error)
-                    }
+            ) = match self.prepare() {
+                Ok(preps) => preps,
+                Err(e) => {
+                    todo!();
                 }
             };
             let mut buf = Buf::Uninit;
+            let mut read_error = Ok(());
 
             loop {
-                if read_error.is_err() {
-                    break;
-                }
-
                 if self.cancel.load(Ordering::SeqCst) {
                     break;
                 }
 
-                let mut reader = reader.as_mut().expect("reader");
                 match reader.read(&mut buf) {
                     Ok(()) => { },
                     Err(e) => {
