@@ -140,11 +140,28 @@ pub mod bitdepth {
     }
 
     fn i24_to_f32(input: i32) -> f32 {
-        todo!()
+        let i24_min: i32 = -(2 ^ 15);
+        let i24_max: i32 = (2 ^ 15) - 1;
+        assert!(input >= i24_min);
+        assert!(input <= i24_max);
+
+        let i24_min = i24_min as f32;
+        let i24_max = i24_max as f32;
+        let input = input as f32;
+
+        let range = i24_max - i24_min;
+
+        (input - i24_min) / range - 1.0
     }
 
     fn i16_to_f32(input: i16) -> f32 {
-        todo!()
+        let i16_min = i16::MIN as f32;
+        let i16_max = i16::MAX as f32;
+        let input = input as f32;
+
+        let range = i16_max - i16_min;
+
+        (input - i16_min) / range - 1.0
     }
 }
 
