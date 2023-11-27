@@ -75,6 +75,12 @@ pub mod bitdepth {
                             outbuf.truncate(0);
                             outbuf.extend(inbuf.iter());
                         }
+                        BitDepth::I24 => {
+                            assert!(!self.dither);
+                            let mut outbuf = self.outbuf.i24_mut();
+                            outbuf.truncate(0);
+                            outbuf.extend(inbuf.iter().copied().map(f32_to_i24));
+                        }
                         _ => todo!()
                     }
                 }
@@ -83,6 +89,10 @@ pub mod bitdepth {
 
             &self.outbuf
         }
+    }
+
+    fn f32_to_i24(input: f32) -> i32 {
+        todo!()
     }
 }
 
