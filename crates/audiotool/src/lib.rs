@@ -82,18 +82,30 @@ pub mod bitdepth {
                             outbuf.extend(inbuf.iter().copied().map(f32_to_i24));
                         }
                         BitDepth::I16 => {
-                            let mut outbuf = self.outbuf.i24_mut();
+                            let mut outbuf = self.outbuf.i16_mut();
                             outbuf.truncate(0);
                             if !self.dither {
-                                outbuf.extend(inbuf.iter().copied().map(f32_to_i24));
+                                outbuf.extend(inbuf.iter().copied().map(f32_to_i16));
                             } else {
                                 outbuf.extend(
                                     inbuf.iter().copied()
-                                        .map(|s| dither_f32_for_i24(s))
-                                        .map(f32_to_i24)
+                                        .map(|s| dither_f32_for_i16(s))
+                                        .map(f32_to_i16)
                                 );
                             }
                         }
+                    }
+                }
+                Buf::I24(inbuf) => {
+                    assert_eq!(self.inbits, BitDepth::I24);
+                    match self.outbits {
+                        BitDepth::F32 => {
+                            assert!(!self.dither);
+                            let mut outbuf = self.outbuf.f32_mut();
+                            outbuf.truncate(0);
+                            outbuf.extend(inbuf.iter().copied().map(i24_to_f32));
+                        }
+                        _ => todo!(),
                     }
                 }
                 _ => todo!(),
@@ -107,7 +119,15 @@ pub mod bitdepth {
         todo!()
     }
 
-    fn dither_f32_for_i24(input: f32) -> f32 {
+    fn f32_to_i16(input: f32) -> i16 {
+        todo!()
+    }
+
+    fn dither_f32_for_i16(input: f32) -> f32 {
+        todo!()
+    }
+
+    fn i24_to_f32(input: i32) -> f32 {
         todo!()
     }
 }
