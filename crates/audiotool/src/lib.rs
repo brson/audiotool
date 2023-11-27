@@ -108,6 +108,18 @@ pub mod bitdepth {
                         _ => todo!(),
                     }
                 }
+                Buf::I16(inbuf) => {
+                    assert_eq!(self.inbits, BitDepth::I16);
+                    match self.outbits {
+                        BitDepth::F32 => {
+                            assert!(!self.dither);
+                            let mut outbuf = self.outbuf.f32_mut();
+                            outbuf.truncate(0);
+                            outbuf.extend(inbuf.iter().copied().map(i16_to_f32));
+                        }
+                        _ => todo!(),
+                    }
+                }
                 _ => todo!(),
             }
 
@@ -128,6 +140,10 @@ pub mod bitdepth {
     }
 
     fn i24_to_f32(input: i32) -> f32 {
+        todo!()
+    }
+
+    fn i16_to_f32(input: i16) -> f32 {
         todo!()
     }
 }
