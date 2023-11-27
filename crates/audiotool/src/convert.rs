@@ -513,9 +513,7 @@ pub mod exec {
 
                                 let res = fs::remove_file(&writer.tmp_path);
                                 if let Err(e) = res {
-                                    if e.kind() != std::io::ErrorKind::NotFound {
-                                        error!("error removing temp file while handling error");
-                                    }
+                                    error!("error removing temp file while handling error: {e}");
                                 }
 
                                 match read_error.as_ref() {
