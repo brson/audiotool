@@ -31,37 +31,18 @@ pub mod bitdepth {
     use crate::types::BitDepth;
     use crate::io::Buf;
 
-    pub struct BitDepthConverter;
+    pub struct BitDepthConverter {
+        dither: bool,
+    }
 
     impl BitDepthConverter {
-        pub fn new(inrate: BitDepth, outrate: BitDepth) -> BitDepthConverter {
+        pub fn new(inbits: BitDepth, outbits: BitDepth, origbits: BitDepth) -> BitDepthConverter {
             todo!()
         }
 
         pub fn convert(&mut self, inbuf: &Buf) -> &Buf {
             todo!()
         }
-    }
-
-    pub fn f32_to_i24(
-        inbuf: &[f32],
-        outbuf: &mut [i32],
-    ) {
-        todo!()
-    }
-
-    pub fn f32_to_i16(
-        inbuf: &[f32],
-        outbuf: &mut [i16],
-    ) {
-        todo!()
-    }
-
-    pub fn i24_to_i16(
-        inbuf: &[i32],
-        outbuf: &mut [i16],
-    ) {
-        todo!()
     }
 }
 

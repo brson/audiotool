@@ -218,7 +218,7 @@ pub mod exec {
     use rx::rand::Rng;
     use crate::types::{Format, SampleRate, BitDepth};
     use std::collections::BTreeMap;
-    use crate::io::{PcmReader, PcmWriter, PanicPcmWriter, Buf};
+    use crate::io::{PcmReader, PcmWriter, PanicPcmWriter, Buf, Props};
     use crate::samplerate::SampleRateConverter;
     use crate::bitdepth::BitDepthConverter;
     use crate::codecs;
@@ -277,7 +277,7 @@ pub mod exec {
             }
         }
 
-        fn converter_plan(&self, channels: &AnyResult<u16>) -> ConverterPlan {
+        fn converter_plan(&self, source_props: &AnyResult<Props>) -> ConverterPlan {
             self.sample_rates.iter().map(|args| {
                 let (
                     sample_rate,
@@ -296,9 +296,9 @@ pub mod exec {
                             path: outfile.path.clone(),
                             tmp_path: tmp_path.clone(),
                             format: outfile.format,
-                            writer: match channels {
-                                Ok(channels) => {
-                                    codecs::writer(&tmp_path, *channels, outfile.format)
+                            writer: match source_props {
+                                Ok(source_props) => {
+                                    codecs::writer(&tmp_path, source_props.channels, outfile.format)
                                 }
                                 Err(_) => {
                                     Box::new(crate::io::PanicPcmWriter)
@@ -310,7 +310,14 @@ pub mod exec {
                     (
                         *bit_depth,
                         (
-                            BitDepthConverter,
+                            BitDepthConverter::new(
+                                BitDepth::F32,
+                                *bit_depth,
+                                match source_props {
+                                    Ok(source_props) => source_props.format.bit_depth,
+                                    Err(_) => BitDepth::F32,
+                                }
+                            ),
                             writers,
                         ),
                     )
@@ -328,10 +335,10 @@ pub mod exec {
 
         fn run(&self) {
             let mut reader = codecs::reader(&self.infile);
-            let channels = reader.props().map(|p| p.channels);
-            let mut sample_rates = self.converter_plan(&channels);
+            let source_props = reader.props();
+            let mut sample_rates = self.converter_plan(&source_props);
             let mut buf = Buf::Uninit;
-            let mut read_error = channels.map(|_| ()).map_err(Arc::new);
+            let mut read_error = source_props.map(|_| ()).map_err(Arc::new);
 
             loop {
                 if read_error.is_err() {
