@@ -326,7 +326,13 @@ pub mod exec {
                 (
                     *sample_rate,
                     (
-                        SampleRateConverter,
+                        SampleRateConverter::new(
+                            match source_props {
+                                Ok(source_props) => source_props.format.sample_rate,
+                                Err(_) => SampleRate::K48,
+                            },
+                            *sample_rate,
+                        ),
                         bit_depths,
                     ),
                 )

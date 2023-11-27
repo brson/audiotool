@@ -10,7 +10,9 @@ pub mod samplerate {
     use crate::types::SampleRate;
     use crate::io::Buf;
 
-    pub struct SampleRateConverter;
+    pub struct SampleRateConverter {
+        x: (),
+    }
 
     impl SampleRateConverter {
         pub fn new(inrate: SampleRate, outrate: SampleRate) -> SampleRateConverter {
