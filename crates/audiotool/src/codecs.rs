@@ -4,14 +4,14 @@ use crate::io::*;
 use crate::types::*;
 use std::ffi::OsStr;
 
-pub fn reader(path: &Path) -> Box<dyn PcmReader> {
+pub fn reader(path: &Path) -> AnyResult<Box<dyn PcmReader>> {
     let ext = path.extension()
         .map(OsStr::to_string_lossy)
         .as_deref()
         .map(str::to_string);
     match ext.as_deref() {
         Some("wav") => {
-            Box::new(wav::WavPcmReader::new(path))
+            Ok(Box::new(wav::WavPcmReader::new(path)))
         }
         _ => {
             todo!()

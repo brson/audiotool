@@ -340,25 +340,47 @@ pub mod exec {
         }
 
         fn run(&self) {
-            let mut reader = codecs::reader(&self.infile);
-            let source_props = reader.props();
-            let mut sample_rates = self.converter_plan(&source_props);
-            let mut buf = Buf::Uninit;
-            let mut f32_converter = match source_props.as_ref() {
-                Ok(source_props) => {
-                    BitDepthConverter::new(
-                        source_props.format.bit_depth,
-                        BitDepth::F32,
-                        source_props.format.bit_depth,
-                    )
-                }
-                Err(_) => {
-                    BitDepthConverter::new(
-                        BitDepth::F32, BitDepth::F32, BitDepth::F32
-                    )
+
+            let (
+                mut reader,
+                mut sample_rates,
+                mut f32_converter,
+                mut read_error,
+            ) = {
+                match codecs::reader(&self.infile) {
+                    Ok(mut reader) => {
+                        let source_props = reader.props();
+                        let mut sample_rates = self.converter_plan(&source_props);
+                        let mut f32_converter = match source_props.as_ref() {
+                            Ok(source_props) => {
+                                BitDepthConverter::new(
+                                    source_props.format.bit_depth,
+                                    BitDepth::F32,
+                                    source_props.format.bit_depth,
+                                )
+                            }
+                            Err(_) => {
+                                BitDepthConverter::new(
+                                    BitDepth::F32, BitDepth::F32, BitDepth::F32
+                                )
+                            }
+                        };
+                        let read_error = source_props.map(|_| ()).map_err(Arc::new);
+
+                        (Some(reader), sample_rates, f32_converter, read_error)
+                    }
+                    reader @ Err(_) => {
+                        let mut sample_rates = self.converter_plan(&Err(anyhow!("placeholder")));
+                        let mut f32_converter = BitDepthConverter::new(
+                            BitDepth::F32, BitDepth::F32, BitDepth::F32
+                        );
+                        let read_error = reader.map(|_| ()).map_err(|e| Arc::new(e));
+
+                        (None, sample_rates, f32_converter, read_error)
+                    }
                 }
             };
-            let mut read_error = source_props.map(|_| ()).map_err(Arc::new);
+            let mut buf = Buf::Uninit;
 
             loop {
                 if read_error.is_err() {
@@ -369,6 +391,7 @@ pub mod exec {
                     break;
                 }
 
+                let mut reader = reader.as_mut().expect("reader");
                 match reader.read(&mut buf) {
                     Ok(()) => { },
                     Err(e) => {
