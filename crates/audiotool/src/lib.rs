@@ -37,6 +37,7 @@ pub mod bitdepth {
         inbits: BitDepth,
         outbits: BitDepth,
         dither: bool,
+        outbuf: Buf,
     }
 
     impl BitDepthConverter {
@@ -58,11 +59,29 @@ pub mod bitdepth {
 
             BitDepthConverter {
                 inbits, outbits, dither,
+                outbuf: Buf::Uninit,
             }
         }
 
         pub fn convert(&mut self, inbuf: &Buf) -> &Buf {
-            todo!()
+            match inbuf {
+                Buf::Uninit => panic!(),
+                Buf::F32(inbuf) => {
+                    assert_eq!(self.inbits, BitDepth::F32);
+                    match self.outbits {
+                        BitDepth::F32 => {
+                            assert!(!self.dither);
+                            let mut outbuf = self.outbuf.f32_mut();
+                            outbuf.truncate(0);
+                            outbuf.extend(inbuf.iter());
+                        }
+                        _ => todo!()
+                    }
+                }
+                _ => todo!(),
+            }
+
+            &self.outbuf
         }
     }
 }
