@@ -338,6 +338,20 @@ pub mod exec {
             let source_props = reader.props();
             let mut sample_rates = self.converter_plan(&source_props);
             let mut buf = Buf::Uninit;
+            let mut f32_converter = match source_props.as_ref() {
+                Ok(source_props) => {
+                    BitDepthConverter::new(
+                        source_props.format.bit_depth,
+                        BitDepth::F32,
+                        source_props.format.bit_depth,
+                    )
+                }
+                Err(_) => {
+                    BitDepthConverter::new(
+                        BitDepth::F32, BitDepth::F32, BitDepth::F32
+                    )
+                }
+            };
             let mut read_error = source_props.map(|_| ()).map_err(Arc::new);
 
             loop {
@@ -356,6 +370,8 @@ pub mod exec {
                         break;
                     }
                 }
+
+                let buf = f32_converter.convert(&buf);
 
                 // At this point `buf` either has data,
                 // or is empty if EOF. Even if EOF
