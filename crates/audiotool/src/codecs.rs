@@ -13,8 +13,11 @@ pub fn reader(path: &Path) -> AnyResult<Box<dyn PcmReader>> {
         Some("wav") => {
             Ok(Box::new(wav::WavPcmReader::new(path)))
         }
-        _ => {
-            todo!()
+        Some(ext) => {
+            Err(anyhow!("unknown extension: `{ext}`"))
+        }
+        None => {
+            Err(anyhow!("no file extension"))
         }
     }
 }
