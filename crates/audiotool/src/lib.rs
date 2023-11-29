@@ -128,11 +128,27 @@ pub mod bitdepth {
     }
 
     fn f32_to_i24(input: f32) -> i32 {
-        todo!()
+        let i24_min: i32 = -(2 ^ 15);
+        let i24_max: i32 = (2 ^ 15) - 1;
+        let i24_min = i24_min as f32;
+        let i24_max = i24_max as f32;
+        debug_assert!(input >= i24_min);
+        debug_assert!(input <= i24_max);
+
+        let range = i24_max - i24_min;
+        let res = (input + 1.0) / 2.0 * range - i24_max;
+        debug_assert!(res >= i24_min as f32 && res <= i24_max as f32);
+        res as i32
     }
 
     fn f32_to_i16(input: f32) -> i16 {
-        todo!()
+        let i16_min = i16::MIN as f32;
+        let i16_max = i16::MAX as f32;
+
+        let range = i16_max - i16_min;
+        let res = (input + 1.0) / 2.0 * range - i16_max;
+        debug_assert!(res >= i16_min && res <= i16_max);
+        res as i16
     }
 
     fn dither_f32_for_i16(input: f32) -> f32 {
@@ -151,7 +167,7 @@ pub mod bitdepth {
 
         let range = i24_max - i24_min;
 
-        let res = (input - i24_min) / range - 1.0;
+        let res = (input - i24_min) / range * 2.0 - 1.0;
         debug_assert!(res >= -1.0 && res <= 1.0);
         res
     }
