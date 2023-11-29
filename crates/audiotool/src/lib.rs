@@ -161,11 +161,11 @@ pub mod bitdepth {
 
     // fixme this is just a guess
     fn dither_f32_for_i16(input: f32, rng: &mut impl Rng) -> f32 {
-        let i24_min: i32 = -(2 ^ 15);
-        let i24_max: i32 = (2 ^ 15) - 1;
-        let i24_min = i24_min as f32;
-        let i24_max = i24_max as f32;
-        let range = i24_max - i24_min;
+        let i16_min = i16::MIN as f32;
+        let i16_max = i16::MAX as f32;
+        let i16_min = i16_min as f32;
+        let i16_max = i16_max as f32;
+        let range = i16_max - i16_min;
 
         let scaled_int_1 = 2.0 / range;
 
