@@ -24,12 +24,11 @@ pub fn reader(path: &Path) -> AnyResult<Box<dyn PcmReader>> {
 
 pub fn writer(
     path: &Path,
-    channels: u16,
-    format: Format
+    props: Props,
 ) -> Box<dyn PcmWriter> {
-    match format.codec {
+    match props.format.codec {
         Codec::Wav => {
-            Box::new(wav::WavPcmWriter::new(path, channels, format.bit_depth, format.sample_rate))
+            Box::new(wav::WavPcmWriter::new(path, props.channels, props.format.bit_depth, props.format.sample_rate))
         }
         Codec::Flac => {
             todo!()

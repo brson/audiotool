@@ -296,7 +296,10 @@ pub mod exec {
                             path: outfile.path.clone(),
                             tmp_path: tmp_path.clone(),
                             format: outfile.format,
-                            writer: codecs::writer(&tmp_path, source_props.channels, outfile.format),
+                            writer: codecs::writer(&tmp_path, Props {
+                                channels: source_props.channels,
+                                format: outfile.format,
+                            }),
                         })
                     }).collect();
 
