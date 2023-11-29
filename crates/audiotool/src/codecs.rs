@@ -28,7 +28,7 @@ pub fn writer(
 ) -> Box<dyn PcmWriter> {
     match props.format.codec {
         Codec::Wav => {
-            Box::new(wav::WavPcmWriter::new(path, props.channels, props.format.bit_depth, props.format.sample_rate))
+            Box::new(wav::WavPcmWriter::new(path, props))
         }
         Codec::Flac => {
             todo!()
@@ -156,22 +156,21 @@ pub mod wav {
     impl WavPcmWriter {
         pub fn new(
             path: &Path,
-            channels: u16,
-            bit_depth: BitDepth,
-            sample_rate: SampleRate,
+            props: Props,
         ) -> WavPcmWriter {
+            assert_eq!(props.format.codec, Codec::Wav);
             let spec = hound::WavSpec {
-                channels,
-                sample_rate: match sample_rate {
+                channels: props.channels,
+                sample_rate: match props.format.sample_rate {
                     SampleRate::K192 => 192_000,
                     SampleRate::K48 => 48_000,
                 },
-                bits_per_sample: match bit_depth {
+                bits_per_sample: match props.format.bit_depth {
                     BitDepth::F32 => 32,
                     BitDepth::I24 => 24,
                     BitDepth::I16 => 16,
                 },
-                sample_format: match bit_depth {
+                sample_format: match props.format.bit_depth {
                     BitDepth::F32 => hound::SampleFormat::Float,
                     BitDepth::I24 => hound::SampleFormat::Int,
                     BitDepth::I16 => hound::SampleFormat::Int,
