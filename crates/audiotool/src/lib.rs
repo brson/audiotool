@@ -32,12 +32,16 @@ pub mod samplerate {
 pub mod bitdepth {
     use crate::types::BitDepth;
     use crate::io::Buf;
+    use rx::rand::Rng;
+    use rx::rand_pcg::Pcg64Mcg;
+    use rand_distr::{Triangular, Distribution};
 
     pub struct BitDepthConverter {
         inbits: BitDepth,
         outbits: BitDepth,
         dither: bool,
         outbuf: Buf,
+        rng: Pcg64Mcg,
     }
 
     impl BitDepthConverter {
@@ -57,9 +61,13 @@ pub mod bitdepth {
                 }
             };
 
+            // "Note that PCG specifies a default value for the parameter"
+            let default_pcg_state = 0xcafef00dd15ea5e5;
+
             BitDepthConverter {
                 inbits, outbits, dither,
                 outbuf: Buf::Uninit,
+                rng: Pcg64Mcg::new(default_pcg_state),
             }
         }
 
@@ -89,7 +97,7 @@ pub mod bitdepth {
                             } else {
                                 outbuf.extend(
                                     inbuf.iter().copied()
-                                        .map(|s| dither_f32_for_i16(s))
+                                        .map(|s| dither_f32_for_i16(s, &mut self.rng))
                                         .map(f32_to_i16)
                                 );
                             }
@@ -151,8 +159,11 @@ pub mod bitdepth {
         res as i16
     }
 
-    fn dither_f32_for_i16(input: f32) -> f32 {
-        todo!()
+    fn dither_f32_for_i16(input: f32, rng: &mut impl Rng) -> f32 {
+        // fixme this is just a guess at how to dither
+        let triangular = Triangular::new(-1.0, 1.0, 0.0).expect(".");
+        let dither = triangular.sample(rng);
+        (input + dither).clamp(-1.0, 1.0)
     }
 
     fn i24_to_f32(input: i32) -> f32 {
