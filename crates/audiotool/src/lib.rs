@@ -207,12 +207,3 @@ pub mod bitdepth {
         res
     }
 }
-
-pub mod dither {
-    pub fn i24(
-        inbuf: &[i32],
-        outbuf: &mut [i32],
-    ) {
-        todo!()
-    }
-}
