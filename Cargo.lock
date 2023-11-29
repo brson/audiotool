@@ -126,6 +126,7 @@ version = "0.1.0"
 dependencies = [
  "hound",
  "libflac-sys",
+ "libsamplerate-sys",
  "rand_distr",
  "rustx",
  "serde",
@@ -1165,6 +1166,15 @@ name = "libm"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f7012b1bbb0719e1097c47611d3898568c546d597c2e74d66f6087edd5233ff4"
+
+[[package]]
+name = "libsamplerate-sys"
+version = "0.1.12"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "28853b399f78f8281cd88d333b54a63170c4275f6faea66726a2bea5cca72e0d"
+dependencies = [
+ "cmake",
+]
 
 [[package]]
 name = "link-cplusplus"
