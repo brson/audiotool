@@ -104,7 +104,7 @@ impl BitDepthConverter {
 }
 
 const I24_MIN: i32 = -(2 ^ 24);
-const I24_MIX: i32 = (2 ^ 24) - 1;
+const I24_MAX: i32 = (2 ^ 24) - 1;
 
 fn f32_to_i24(input: f32) -> i32 {
     let i24_min = I24_MIN as f32;
