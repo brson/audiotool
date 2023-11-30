@@ -103,11 +103,12 @@ impl BitDepthConverter {
     }
 }
 
+const I24_MIN: i32 = -(2 ^ 24);
+const I24_MIX: i32 = (2 ^ 24) - 1;
+
 fn f32_to_i24(input: f32) -> i32 {
-    let i24_min: i32 = -(2 ^ 15);
-    let i24_max: i32 = (2 ^ 15) - 1;
-    let i24_min = i24_min as f32;
-    let i24_max = i24_max as f32;
+    let i24_min = I24_MIN as f32;
+    let i24_max = I24_MAX as f32;
     debug_assert!(input >= i24_min);
     debug_assert!(input <= i24_max);
 
@@ -147,13 +148,11 @@ fn dither_f32_for_i16(input: f32, rng: &mut impl Rng) -> f32 {
 }
 
 fn i24_to_f32(input: i32) -> f32 {
-    let i24_min: i32 = -(2 ^ 15);
-    let i24_max: i32 = (2 ^ 15) - 1;
-    debug_assert!(input >= i24_min);
-    debug_assert!(input <= i24_max);
+    debug_assert!(input >= I24_MIN);
+    debug_assert!(input <= I24_MAX);
 
-    let i24_min = i24_min as f32;
-    let i24_max = i24_max as f32;
+    let i24_min = I24_MIN as f32;
+    let i24_max = I24_MAX as f32;
     let input = input as f32;
 
     let range = i24_max - i24_min;
