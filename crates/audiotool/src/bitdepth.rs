@@ -24,6 +24,8 @@ impl BitDepthConverter {
             (BitDepth::F32, BitDepth::F32, BitDepth::I16) => false,
             (BitDepth::F32, BitDepth::I24, BitDepth::I16) => false,
             (BitDepth::F32, BitDepth::I16, BitDepth::I16) => false,
+            (BitDepth::I24, BitDepth::F32, BitDepth::I24) => false,
+            (BitDepth::I16, BitDepth::F32, BitDepth::I16) => false,
             (_, _, _) => {
                 todo!()
             }
