@@ -39,17 +39,15 @@ impl BitDepthConverter {
         }
     }
 
-    pub fn convert(&mut self, inbuf: &Buf) -> &Buf {
+    pub fn convert<'a>(&'a mut self, inbuf: &'a Buf) -> &'a Buf {
         match inbuf {
             Buf::Uninit => panic!(),
-            Buf::F32(inbuf) => {
+            i @ Buf::F32(inbuf) => {
                 assert_eq!(self.inbits, BitDepth::F32);
                 match self.outbits {
                     BitDepth::F32 => {
                         assert!(!self.dither);
-                        let mut outbuf = self.outbuf.f32_mut();
-                        outbuf.truncate(0);
-                        outbuf.extend(inbuf.iter());
+                        return i;
                     }
                     BitDepth::I24 => {
                         assert!(!self.dither);
