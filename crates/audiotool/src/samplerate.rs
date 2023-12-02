@@ -62,15 +62,40 @@ impl SampleRateConverter {
 
                 let err = unsafe { src_process(self.state, &mut data) };
                 assert_eq!(err, 0);
+
+                assert_eq!(data.input_frames_used, data.input_frames);
+                let output_bytes_gen = data.output_frames_gen as usize * (self.channels as usize);
+                outbuf.truncate(output_bytes_gen);
                 
-                todo!();
+                &self.outbuf
             }
             _ => panic!(),
         }
     }
 
     pub fn finalize(&mut self) -> &Buf {
-        todo!()
+        let expected_outbuf_size = 1 * self.channels as usize;
+        let mut outbuf = self.outbuf.f32_mut();
+        outbuf.resize(expected_outbuf_size, 0.0);
+        let mut data = SRC_DATA {
+            data_in: std::ptr::null(),
+            data_out: outbuf.as_mut_ptr(),
+            input_frames: 0,
+            output_frames: (expected_outbuf_size  / self.channels as usize) as c_long,
+            input_frames_used: 0,
+            output_frames_gen: 0,
+            end_of_input: 1,
+            src_ratio: self.src_ratio,
+        };
+
+        let err = unsafe { src_process(self.state, &mut data) };
+        assert_eq!(err, 0);
+
+        assert_eq!(data.input_frames_used, data.input_frames);
+        let output_bytes_gen = data.output_frames_gen as usize * (self.channels as usize);
+        outbuf.truncate(output_bytes_gen);
+        
+        &self.outbuf
     }
 }
 
