@@ -5,6 +5,8 @@ use rx::libc::c_int;
 
 pub struct SampleRateConverter {
     st: *mut SRC_STATE,
+    outbuf: Buf,
+    src_ratio: f64,
 }
 
 unsafe impl Send for SampleRateConverter {}
@@ -23,11 +25,20 @@ impl SampleRateConverter {
         assert!(error != 0);
         assert!(!st.is_null());
 
-        SampleRateConverter { st }
+        SampleRateConverter {
+            st,
+            outbuf: Buf::Uninit,
+            src_ratio: todo!(),
+        }
     }
 
     pub fn convert(&mut self, inbuf: &Buf) -> &Buf {
-        todo!()
+        match inbuf {
+            Buf::F32(inbuf) => {
+                todo!()
+            }
+            _ => panic!(),
+        }
     }
 
     pub fn finalize(&mut self) -> &Buf {
@@ -37,5 +48,6 @@ impl SampleRateConverter {
 
 impl Drop for SampleRateConverter {
     fn drop(&mut self) {
+        unsafe { src_delete(self.st); }
     }
 }
