@@ -49,3 +49,12 @@ pub enum SampleRate {
     K192,
     K48,
 }
+
+impl SampleRate {
+    pub fn as_u32(&self) -> u32 {
+        match self {
+            SampleRate::K192 => 192_000,
+            SampleRate::K48 => 48_000,
+        }
+    }
+}

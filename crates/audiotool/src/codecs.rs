@@ -161,10 +161,7 @@ pub mod wav {
             assert_eq!(props.format.codec, Codec::Wav);
             let spec = hound::WavSpec {
                 channels: props.channels,
-                sample_rate: match props.format.sample_rate {
-                    SampleRate::K192 => 192_000,
-                    SampleRate::K48 => 48_000,
-                },
+                sample_rate: props.format.sample_rate.as_u32(),
                 bits_per_sample: match props.format.bit_depth {
                     BitDepth::F32 => 32,
                     BitDepth::I24 => 24,
