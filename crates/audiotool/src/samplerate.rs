@@ -20,6 +20,9 @@ impl SampleRateConverter {
             )
         };
 
+        assert!(error != 0);
+        assert!(!st.is_null());
+
         SampleRateConverter { st }
     }
 
