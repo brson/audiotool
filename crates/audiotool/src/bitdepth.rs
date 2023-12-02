@@ -113,7 +113,7 @@ pub fn f32_to_i24(input: f32) -> i32 {
     debug_assert!(input <= i24_max);
 
     let range = i24_max - i24_min;
-    let res = (input + 1.0) / 2.0 * range + i24_min;
+    let res = (input * range) - 0.5;
     debug_assert!(res >= i24_min as f32 && res <= i24_max as f32);
     res as i32
 }
@@ -157,7 +157,7 @@ pub fn i24_to_f32(input: i32) -> f32 {
 
     let range = i24_max - i24_min;
 
-    let res = (input - i24_min) / range * 2.0 - 1.0;
+    let res = (input + 0.5) / range;
     debug_assert!(res >= -1.0 && res <= 1.0);
     res
 }
