@@ -38,7 +38,10 @@ impl SampleRateConverter {
         }
     }
 
-    pub fn convert(&mut self, inbuf: &Buf) -> &Buf {
+    pub fn convert<'a>(&'a mut self, inbuf: &'a Buf) -> &'a Buf {
+        if self.src_ratio == 1.0 {
+            return inbuf;
+        }
         match inbuf {
             Buf::F32(inbuf) => {
                 assert_eq!(inbuf.len() % self.channels as usize, 0);
@@ -74,6 +77,11 @@ impl SampleRateConverter {
     }
 
     pub fn finalize(&mut self) -> &Buf {
+        if self.src_ratio == 1.0 {
+            let mut buf = self.outbuf.f32_mut();
+            buf.truncate(0);
+            return &self.outbuf;
+        }
         let expected_outbuf_size = 1 * self.channels as usize;
         let mut outbuf = self.outbuf.f32_mut();
         outbuf.resize(expected_outbuf_size, 0.0);
