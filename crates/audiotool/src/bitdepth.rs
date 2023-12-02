@@ -103,8 +103,8 @@ impl BitDepthConverter {
     }
 }
 
-const I24_MIN: i32 = -(2 ^ 24);
-const I24_MAX: i32 = (2 ^ 24) - 1;
+pub const I24_MIN: i32 = -(2 ^ 24);
+pub const I24_MAX: i32 = (2 ^ 24) - 1;
 
 pub fn f32_to_i24(input: f32) -> i32 {
     let i24_min = I24_MIN as f32;
@@ -113,7 +113,7 @@ pub fn f32_to_i24(input: f32) -> i32 {
     debug_assert!(input <= i24_max);
 
     let range = i24_max - i24_min;
-    let res = (input + 1.0) / 2.0 * range - i24_max;
+    let res = (input + 1.0) / 2.0 * range + i24_min;
     debug_assert!(res >= i24_min as f32 && res <= i24_max as f32);
     res as i32
 }
