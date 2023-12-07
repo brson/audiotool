@@ -544,48 +544,45 @@ pub mod exec {
             // Do cleanups and send cancellation / file read errors.
             for (_, (_, bit_depths)) in sample_rates.into_iter() {
                 for (_, (_, writers)) in bit_depths.into_iter() {
-                    for writer in writers {
-                        match writer {
-                            None => {
-                                // The outfile has been completely handled,
-                                // either written, or an error.
+                    // Any writers that are `None` have been completed,
+                    // either written fully, or errored;
+                    // and don't need to be cleaned up on cancellation or read error.
+                    // `filter_map` on the identity function will remove `None`s.
+                    let remaining_writers = writers.into_iter().filter_map(std::convert::identity);
+                    for writer in remaining_writers {
+                        // Conversion was cancelled or there was
+                        // an error reading the infile.
+
+                        // Drop the writer so it closes any handles.
+                        // This might matter on windows.
+                        drop(writer.writer);
+
+                        let res = fs::remove_file(&writer.tmp_path);
+                        if let Err(e) = res {
+                            error!("error removing temp file while handling error: {e}");
+                        }
+
+                        match read_error.as_ref() {
+                            Ok(()) => {
+                                self.tx.send(Response::NextResult(
+                                    ConvertResult {
+                                        in_path: self.infile.to_owned(),
+                                        out_path: writer.path,
+                                        format: writer.format,
+                                        error: Err(anyhow!("cancelled")),
+                                    }
+                                ));
                             }
-                            Some(writer) => {
-                                // Conversion was cancelled or there was
-                                // an error reading the infile.
-
-                                // Drop the writer so it closes any handles.
-                                // This might matter on windows.
-                                drop(writer.writer);
-
-                                let res = fs::remove_file(&writer.tmp_path);
-                                if let Err(e) = res {
-                                    error!("error removing temp file while handling error: {e}");
-                                }
-
-                                match read_error.as_ref() {
-                                    Ok(()) => {
-                                        self.tx.send(Response::NextResult(
-                                            ConvertResult {
-                                                in_path: self.infile.to_owned(),
-                                                out_path: writer.path,
-                                                format: writer.format,
-                                                error: Err(anyhow!("cancelled")),
-                                            }
-                                        ));
+                            Err(e) => {
+                                self.tx.send(Response::NextResult(
+                                    ConvertResult {
+                                        in_path: self.infile.to_owned(),
+                                        out_path: writer.path,
+                                        format: writer.format,
+                                        // fixme: don't stringify this error
+                                        error: Err(anyhow!("{}", e).context("file read error")),
                                     }
-                                    Err(e) => {
-                                        self.tx.send(Response::NextResult(
-                                            ConvertResult {
-                                                in_path: self.infile.to_owned(),
-                                                out_path: writer.path,
-                                                format: writer.format,
-                                                // fixme: don't stringify this error
-                                                error: Err(anyhow!("{}", e).context("file read error")),
-                                            }
-                                        ));
-                                    }
-                                }
+                                ));
                             }
                         }
                     }
