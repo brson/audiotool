@@ -23,7 +23,7 @@ impl SampleRateConverter {
             )
         };
 
-        assert!(error != 0);
+        assert!(error == 0);
         assert!(!state.is_null());
 
         let inrate = inrate.as_u32() as f64;
