@@ -17,10 +17,10 @@ pub mod config {
     impl Config {
         pub fn template() -> Config {
             Config {
-                reference_tracks_dir: S!("./in/").into(),
-                reference_track_regex: S!("\\.wav"),
-                out_root_dir: S!("./out/").into(),
-                out_path_template: "{{out_root_dir}}/{{relative_path}}/{{file_stem}}.{{format_ext}}".to_string(),
+                reference_tracks_dir: S("./in/").into(),
+                reference_track_regex: S("\\.wav"),
+                out_root_dir: S("./out/").into(),
+                out_path_template: S("{{out_root_dir}}/{{relative_path}}/{{file_stem}}.{{format_ext}}"),
                 formats: vec![
                     Format {
                         codec: Codec::Wav,
