@@ -5,7 +5,7 @@ use std::path::Path;
 use std::iter;
 use audiotool::convert as cvt;
 use audiotool::types::*;
-use audiotool::io::{Props, Buf, PcmReader, PcmWriter};
+use audiotool::io::{Props, Buf};
 use audiotool::codecs;
 
 fn write_test_file(
@@ -37,7 +37,15 @@ fn read_file(path: &Path) -> AnyResult<(Props, Buf)> {
     #[extension_trait]
     impl BufExt for Buf {
         fn append(&mut self, other: &Buf) {
-            todo!()
+            match (self, other) {
+                (this @ Buf::Uninit, Buf::F32(other)) => {
+                    *this = Buf::F32(other.clone());
+                }
+                (Buf::F32(ref mut this), Buf::F32(other)) => {
+                    this.extend(other.iter());
+                },
+                 _ => todo!(),
+            }
         }
     }
 
@@ -59,22 +67,21 @@ fn read_file(path: &Path) -> AnyResult<(Props, Buf)> {
 }
 
 fn run_convert(config: cvt::config::Config) -> AnyResult<()> {
-    let (tx, rx) = cvt::plan::spawn(config);
+    let (_tx, rx) = cvt::plan::spawn(config);
 
     let plan = match rx.recv().expect("recv") {
         cvt::plan::Response::Done(Ok(Some(plan))) => plan,
         cvt::plan::Response::Done(Ok(None)) => panic!(),
         cvt::plan::Response::Done(Err(e)) => panic!("{e}"),
     };
-    eprintln!("{plan:#?}");
 
-    let (tx, rx) = cvt::exec::spawn(plan);
+    let (_tx, rx) = cvt::exec::spawn(plan);
 
     loop {
         let resp = rx.recv()?;
 
         match resp {
-            cvt::exec::Response::NextResult(res) => {
+            cvt::exec::Response::NextResult(_res) => {
                 //println!("{res:#?}");
             }
             cvt::exec::Response::Done => {
@@ -119,10 +126,9 @@ fn basic() -> AnyResult<()> {
     let infile = config.reference_tracks_dir.join("test.wav");
     let outfile = config.out_root_dir.join("test.wav");
 
-    let channels = 2;
     let frames = 1024;
 
-    let inbuf = write_test_file(&infile, inprops, 1024)?;
+    let inbuf = write_test_file(&infile, inprops, frames)?;
     run_convert(config)?;
     let (outprops, outbuf) = read_file(&outfile)?;
 
