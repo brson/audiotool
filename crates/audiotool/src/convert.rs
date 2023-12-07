@@ -291,7 +291,16 @@ pub mod exec {
                     ) = args;
 
                     let writers = outfiles.iter().map(|outfile| {
-                        let tmp_path = tmp_path(&outfile.path); 
+                        let out_dir = outfile.path.parent();
+                        // fixme only call create_dir_all once per directory
+                        // fixme error handling
+                        if let Some(out_dir) = out_dir {
+                            match std::fs::create_dir_all(&out_dir) {
+                                Ok(_) => { }
+                                Err(e) => todo!("{e}"),
+                            }
+                        }
+                        let tmp_path = tmp_path(&outfile.path);
                         Some(OutFileWriter {
                             path: outfile.path.clone(),
                             tmp_path: tmp_path.clone(),

@@ -83,6 +83,8 @@ fn basic() -> AnyResult<()> {
         ]
     };
 
+    std::fs::create_dir_all(&config.reference_tracks_dir)?;
+
     let inprops = Props {
         format: Format {
             codec: Codec::Wav,
