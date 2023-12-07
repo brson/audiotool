@@ -632,7 +632,13 @@ impl Config {
 
         let outpath_vars = OutPathVars {
             out_root_dir: self.out_root_dir.clone(),
-            relative_path: path.strip_prefix(&self.reference_tracks_dir)?.to_owned(),
+            relative_path: {
+                path.strip_prefix(&self.reference_tracks_dir)?
+                    .parent()
+                    .filter(|p| p != &Path::new(""))
+                    .unwrap_or(Path::new("."))
+                    .to_path_buf()
+            },
             file_stem: if let Some(file_stem) = path.file_stem() {
                 file_stem.to_str().ok_or_else(|| {
                     anyhow!("can't convert file stem to UTF-8")

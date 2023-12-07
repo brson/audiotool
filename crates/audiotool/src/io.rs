@@ -38,17 +38,6 @@ fn static_assertions(
     writer: &dyn PcmWriter,
 ) { }
 
-impl Buf {
-    pub fn is_empty(&self) -> bool {
-        match self {
-            Buf::Uninit => true,
-            Buf::F32(v) => v.is_empty(),
-            Buf::I24(v) => v.is_empty(),
-            Buf::I16(v) => v.is_empty(),
-        }
-    }
-}
-
 pub struct PanicPcmWriter;
 
 impl PcmWriter for PanicPcmWriter {
@@ -61,6 +50,15 @@ impl PcmWriter for PanicPcmWriter {
 }
 
 impl Buf {
+    pub fn is_empty(&self) -> bool {
+        match self {
+            Buf::Uninit => true,
+            Buf::F32(v) => v.is_empty(),
+            Buf::I24(v) => v.is_empty(),
+            Buf::I16(v) => v.is_empty(),
+        }
+    }
+
     pub fn f32_mut(&mut self) -> &mut Vec<f32> {
         match self {
             Buf::F32(buf) => buf,

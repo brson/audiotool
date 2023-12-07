@@ -34,7 +34,28 @@ fn write_test_file(
 }
 
 fn read_file(path: &Path) -> AnyResult<(Props, Buf)> {
-    todo!()
+    #[extension_trait]
+    impl BufExt for Buf {
+        fn append(&mut self, other: &Buf) {
+            todo!()
+        }
+    }
+
+    let mut reader = codecs::reader(path)?;
+    let mut all_buf = Buf::Uninit;
+    let mut tmp_buf = Buf::Uninit;
+
+    loop {
+        reader.read(&mut tmp_buf)?;
+
+        if tmp_buf.is_empty() {
+            break;
+        }
+
+        all_buf.append(&tmp_buf);
+    }
+
+    Ok((reader.props()?, all_buf))
 }
 
 fn run_convert(config: cvt::config::Config) -> AnyResult<()> {
@@ -45,6 +66,7 @@ fn run_convert(config: cvt::config::Config) -> AnyResult<()> {
         cvt::plan::Response::Done(Ok(None)) => panic!(),
         cvt::plan::Response::Done(Err(e)) => panic!("{e}"),
     };
+    eprintln!("{plan:#?}");
 
     let (tx, rx) = cvt::exec::spawn(plan);
 
