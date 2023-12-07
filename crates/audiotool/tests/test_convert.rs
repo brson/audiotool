@@ -17,6 +17,35 @@ fn load_file(path: &Path) -> (Props, Buf) {
     todo!()
 }
 
+fn run_convert(config: cvt::config::Config) -> AnyResult<()> {
+    let (tx, rx) = cvt::plan::spawn(config);
+    let plan = match rx.recv().expect("recv") {
+        cvt::plan::Response::Done(Ok(Some(plan))) => plan,
+        cvt::plan::Response::Done(Ok(None)) => panic!(),
+        cvt::plan::Response::Done(Err(e)) => panic!("{e}"),
+    };
+    
+    let (tx, rx) = cvt::exec::spawn(plan);
+
+    loop {
+        let resp = rx.recv()?;
+
+        match resp {
+            cvt::exec::Response::NextResult(res) => {
+                //println!("{res:#?}");
+            }
+            cvt::exec::Response::Done => {
+                break;
+            }
+            cvt::exec::Response::Cancelled => {
+                panic!();
+            }
+        }
+    }
+
+    Ok(())
+}
+
 #[test]
 fn basic() -> AnyResult<()> {
     let tempdir = rx::tempfile::tempdir()?;
@@ -46,32 +75,7 @@ fn basic() -> AnyResult<()> {
     let frames = 1024;
 
     write_test_file(&infile, informat, 2, 1024)?;
-
-    let (tx, rx) = cvt::plan::spawn(config);
-    let plan = match rx.recv().expect("recv") {
-        cvt::plan::Response::Done(Ok(Some(plan))) => plan,
-        cvt::plan::Response::Done(Ok(None)) => panic!(),
-        cvt::plan::Response::Done(Err(e)) => panic!("{e}"),
-    };
-    
-    let (tx, rx) = cvt::exec::spawn(plan);
-
-    loop {
-        let resp = rx.recv()?;
-
-        match resp {
-            cvt::exec::Response::NextResult(res) => {
-                //println!("{res:#?}");
-            }
-            cvt::exec::Response::Done => {
-                break;
-            }
-            cvt::exec::Response::Cancelled => {
-                panic!();
-            }
-        }
-    }
-
+    run_convert(config.clone())?;
     
 
     todo!()
