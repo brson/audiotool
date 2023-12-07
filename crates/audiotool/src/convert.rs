@@ -20,7 +20,7 @@ pub mod config {
                 reference_tracks_dir: S!("./in/").into(),
                 reference_track_regex: S!("\\.wav"),
                 out_root_dir: S!("./out/").into(),
-                out_path_template: S!("{{out_root_dir}}/{{relative_path}}/{{file_stem}}.{{format_ext}}"),
+                out_path_template: "{{out_root_dir}}/{{relative_path}}/{{file_stem}}.{{format_ext}}".to_string(),
                 formats: vec![
                     Format {
                         codec: Codec::Wav,

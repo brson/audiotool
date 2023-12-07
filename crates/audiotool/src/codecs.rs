@@ -173,7 +173,6 @@ pub mod wav {
                     BitDepth::I16 => hound::SampleFormat::Int,
                 },
             };
-            eprintln!("{path:?}");
             WavPcmWriter {
                 writer: Some(hound::WavWriter::create(path, spec)),
             }

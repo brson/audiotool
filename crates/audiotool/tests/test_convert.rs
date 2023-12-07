@@ -73,7 +73,7 @@ fn basic() -> AnyResult<()> {
         reference_tracks_dir: tempdir.path().join("in"),
         reference_track_regex: S!("\\.wav$"),
         out_root_dir: tempdir.path().join("out"),
-        out_path_template: S!("{{out_root_dir}}/{{relative_path}}/{{file_stem}}.{{format_ext}}"),
+        out_path_template: "{{out_root_dir}}/{{relative_path}}/{{file_stem}}.{{format_ext}}".to_string(),
         formats: vec![
             Format {
                 codec: Codec::Wav,
