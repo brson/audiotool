@@ -1,15 +1,36 @@
 use rx::prelude::*;
+use rx::rand_pcg::Pcg64Mcg;
+use rx::rand::Rng;
+use std::path::Path;
+use std::iter;
 use audiotool::convert as cvt;
 use audiotool::types::*;
-use audiotool::io::{Props, Buf};
-use std::path::Path;
+use audiotool::io::{Props, Buf, PcmReader, PcmWriter};
+use audiotool::codecs;
 
 fn write_test_file(
     path: &Path,
-    props: &Props,
+    props: Props,
     frames: u32,
 ) -> AnyResult<Buf> {
-    todo!()
+    let mut rng = Pcg64Mcg::new(0);
+    let samples = frames as usize * props.channels as usize;
+    let buf = match props.format.bit_depth {
+        BitDepth::F32 => {
+            Buf::F32(
+                iter::from_fn(|| {
+                    Some(rng.gen_range(-1.0..=1.0))
+                }).take(samples).collect()
+            )
+        }
+        _ => todo!(),
+    };
+
+    let mut writer = codecs::writer(path, props);
+    writer.write(&buf)?;
+    writer.finalize()?;
+
+    Ok(buf)
 }
 
 fn read_file(path: &Path) -> AnyResult<(Props, Buf)> {
@@ -76,7 +97,7 @@ fn basic() -> AnyResult<()> {
     let channels = 2;
     let frames = 1024;
 
-    let inbuf = write_test_file(&infile, &inprops, 1024)?;
+    let inbuf = write_test_file(&infile, inprops, 1024)?;
     run_convert(config)?;
     let (outprops, outbuf) = read_file(&outfile)?;
 

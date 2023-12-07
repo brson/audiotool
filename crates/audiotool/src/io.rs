@@ -9,7 +9,7 @@ pub enum Buf {
     I16(Vec<i16>),
 }
 
-#[derive(Eq, PartialEq, Debug)]
+#[derive(Eq, PartialEq, Debug, Copy, Clone)]
 pub struct Props {
     pub channels: u16,
     pub format: Format,
