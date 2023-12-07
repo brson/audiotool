@@ -36,6 +36,7 @@ pub mod config {
 pub mod plan {
     use rx::prelude::*;
     use rx::rayon::{self, prelude::*};
+    use rx::regex::Regex;
 
     use super::config::Config;
     use crate::types::Format;
@@ -92,8 +93,10 @@ pub mod plan {
         config: Config,
         rx: Receiver<Request>,
     ) -> AnyResult<Option<Plan>> {
+        let regex = Regex::new(&config.reference_track_regex)?;
         let mut outputs = Vec::new();
 
+        // nb: supports symlink root dir, but not following symlinks
         let walkdir = WalkDir::new(&config.reference_tracks_dir)
             .into_iter();
 
@@ -108,10 +111,25 @@ pub mod plan {
             }
 
             let entry = entry?;
+
+            // nb: this doesn't support symlinked input files
             if !entry.file_type().is_file() {
                 continue;
             }
+
             let infile = entry.path();
+            
+            match infile.to_str() {
+                Some(infile) => {
+                    if !regex.is_match(infile) {
+                        continue;
+                    }
+                }
+                None => {
+                    todo!("non-utf8 infile");
+                }
+            }
+
             let outfiles: AnyResult<Vec<_>> = config.outputs_for(&infile).collect();
             let outfiles = outfiles?;
 
