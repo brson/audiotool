@@ -6,14 +6,13 @@ use std::path::Path;
 
 fn write_test_file(
     path: &Path,
-    format: Format,
-    channels: u16,
+    props: &Props,
     frames: u32,
 ) -> AnyResult<Buf> {
     todo!()
 }
 
-fn load_file(path: &Path) -> (Props, Buf) {
+fn read_file(path: &Path) -> AnyResult<(Props, Buf)> {
     todo!()
 }
 
@@ -63,10 +62,13 @@ fn basic() -> AnyResult<()> {
         ]
     };
 
-    let informat = Format {
-        codec: Codec::Wav,
-        bit_depth: BitDepth::F32,
-        sample_rate: SampleRate::K48,
+    let inprops = Props {
+        format: Format {
+            codec: Codec::Wav,
+            bit_depth: BitDepth::F32,
+            sample_rate: SampleRate::K48,
+        },
+        channels: 2,
     };
     let infile = config.reference_tracks_dir.join("test.wav");
     let outfile = config.out_root_dir.join("test.wav");
@@ -74,9 +76,12 @@ fn basic() -> AnyResult<()> {
     let channels = 2;
     let frames = 1024;
 
-    write_test_file(&infile, informat, 2, 1024)?;
-    run_convert(config.clone())?;
-    
+    let inbuf = write_test_file(&infile, &inprops, 1024)?;
+    run_convert(config)?;
+    let (outprops, outbuf) = read_file(&outfile)?;
 
-    todo!()
+    assert_eq!(inprops, outprops);
+    assert_eq!(inbuf, outbuf);
+
+    Ok(())
 }

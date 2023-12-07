@@ -1,6 +1,7 @@
 use rx::prelude::*;
 use crate::types::*;
 
+#[derive(PartialEq, Debug)]
 pub enum Buf {
     Uninit,
     F32(Vec<f32>),
@@ -8,6 +9,7 @@ pub enum Buf {
     I16(Vec<i16>),
 }
 
+#[derive(Eq, PartialEq, Debug)]
 pub struct Props {
     pub channels: u16,
     pub format: Format,
