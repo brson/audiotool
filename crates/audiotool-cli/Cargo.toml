@@ -15,3 +15,4 @@ rx.features = [
 [[bin]]
 name = "audiotool"
 path = "src/main.rs"
+test = false

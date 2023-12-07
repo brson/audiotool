@@ -5,6 +5,9 @@ license.workspace = true
 authors.workspace = true
 edition.workspace = true
 
+[lib]
+test = false
+
 [dependencies]
 rx.workspace = true
 rx.features = [
