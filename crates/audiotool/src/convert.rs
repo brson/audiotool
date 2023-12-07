@@ -533,6 +533,14 @@ pub mod exec {
                 }
             }
 
+            self.do_cleanups(sample_rates, read_error);
+        }
+
+        fn do_cleanups(
+            &self,
+            sample_rates: ConverterPlan,
+            read_error: Result<(), Arc<rx::anyhow::Error>>,
+        ) {
             // Do cleanups and send cancellation / file read errors.
             for (_, (_, bit_depths)) in sample_rates.into_iter() {
                 for (_, (_, writers)) in bit_depths.into_iter() {
@@ -583,6 +591,7 @@ pub mod exec {
                     }
                 }
             }
+
         }
     }
 
