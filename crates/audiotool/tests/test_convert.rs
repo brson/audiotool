@@ -39,12 +39,13 @@ fn read_file(path: &Path) -> AnyResult<(Props, Buf)> {
 
 fn run_convert(config: cvt::config::Config) -> AnyResult<()> {
     let (tx, rx) = cvt::plan::spawn(config);
+
     let plan = match rx.recv().expect("recv") {
         cvt::plan::Response::Done(Ok(Some(plan))) => plan,
         cvt::plan::Response::Done(Ok(None)) => panic!(),
         cvt::plan::Response::Done(Err(e)) => panic!("{e}"),
     };
-    
+
     let (tx, rx) = cvt::exec::spawn(plan);
 
     loop {

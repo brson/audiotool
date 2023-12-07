@@ -46,10 +46,12 @@ pub mod plan {
     use std::path::PathBuf;
     use std::thread;
 
+    #[derive(Debug)]
     pub struct Plan {
         pub outputs: Vec<InfilePlan>,
     }
 
+    #[derive(Debug)]
     pub struct InfilePlan {
         pub infile: PathBuf,
         pub outfiles: Vec<OutFile>,
@@ -92,7 +94,10 @@ pub mod plan {
     ) -> AnyResult<Option<Plan>> {
         let mut outputs = Vec::new();
 
-        for entry in WalkDir::new(&config.reference_tracks_dir).into_iter() {
+        let walkdir = WalkDir::new(&config.reference_tracks_dir)
+            .into_iter();
+
+        for entry in walkdir {
             match rx.try_recv() {
                 Ok(Request::Cancel) | Err(TryRecvError::Disconnected) => {
                     return Ok(None);
@@ -103,6 +108,9 @@ pub mod plan {
             }
 
             let entry = entry?;
+            if !entry.file_type().is_file() {
+                continue;
+            }
             let infile = entry.path();
             let outfiles: AnyResult<Vec<_>> = config.outputs_for(&infile).collect();
             let outfiles = outfiles?;
@@ -365,7 +373,7 @@ pub mod exec {
             ) = match self.prepare() {
                 Ok(preps) => preps,
                 Err(e) => {
-                    todo!();
+                    todo!("{e}");
                 }
             };
             let mut buf = Buf::Uninit;
@@ -579,6 +587,7 @@ use rx::tera::{Tera, Context as TeraContext};
 use rx::serde::Serialize;
 
 #[derive(Clone)]
+#[derive(Debug)]
 pub struct OutFile {
     path: PathBuf,
     format: Format,
