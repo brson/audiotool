@@ -43,7 +43,7 @@ struct ConvertCommand {
 
 #[derive(clap::Args)]
 struct TemplateCommand {
-    config: PathBuf,
+    path: Option<PathBuf>,
 }
 
 impl Cli {
@@ -114,7 +114,14 @@ impl TemplateCommand {
         let config = cvt::config::Config::template();
         let config = rx::toml::to_string(&config)?;
 
-        fs::write(&self.config, &config)?;
+        match &self.path {
+            Some(path) => {
+                fs::write(path, &config)?;
+            }
+            None => {
+                println!("{config}");
+            }
+        }
 
         Ok(())
     }
