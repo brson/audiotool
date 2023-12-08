@@ -13,6 +13,12 @@ pub fn reader(path: &Path) -> AnyResult<Box<dyn PcmReader>> {
         Some("wav") => {
             Ok(Box::new(wav::WavPcmReader::new(path)))
         }
+        Some("flac") => {
+            Ok(Box::new(flac::FlacPcmReader::new(path)))
+        }
+        Some("ogg") => {
+            Ok(Box::new(vorbis::VorbisPcmReader::new(path)))
+        }
         Some(ext) => {
             Err(anyhow!("unknown extension: `{ext}`"))
         }
@@ -31,10 +37,10 @@ pub fn writer(
             Box::new(wav::WavPcmWriter::new(path, props))
         }
         Codec::Flac => {
-            todo!()
+            Box::new(flac::FlacPcmWriter::new(path, props))
         }
         Codec::Vorbis => {
-            todo!()
+            Box::new(vorbis::VorbisPcmWriter::new(path, props))
         }
     }
 }
@@ -232,7 +238,115 @@ pub mod wav {
 }
 
 pub mod flac {
+    use rx::prelude::*;
+    use crate::types::{Format, BitDepth, SampleRate, Codec};
+    use crate::io::{PcmReader, PcmWriter, Buf, Props};
+    use std::path::Path;
+    use std::io::{BufReader, BufWriter};
+    use std::fs::File;
+
+    pub struct FlacPcmReader {
+    }
+
+    impl FlacPcmReader {
+        pub fn new(path: &Path) -> FlacPcmReader {
+            FlacPcmReader {
+            }
+        }
+    }
+
+    impl PcmReader for FlacPcmReader {
+        fn props(&mut self) -> AnyResult<Props> {
+            todo!()
+        }
+
+        fn read(
+            &mut self,
+            buf: &mut Buf,
+        ) -> AnyResult<()> {
+            todo!()
+        }
+    }
+
+    pub struct FlacPcmWriter {
+    }
+
+    impl FlacPcmWriter {
+        pub fn new(
+            path: &Path,
+            props: Props,
+        ) -> FlacPcmWriter {
+            todo!()
+        }
+    }
+
+    impl PcmWriter for FlacPcmWriter {
+        fn write(
+            &mut self,
+            buf: &Buf,
+        ) -> AnyResult<()> {
+            todo!()
+        }
+
+        fn finalize(&mut self) -> AnyResult<()> {
+            todo!()
+        }
+    }
 }
 
 pub mod vorbis {
+    use rx::prelude::*;
+    use crate::types::{Format, BitDepth, SampleRate, Codec};
+    use crate::io::{PcmReader, PcmWriter, Buf, Props};
+    use std::path::Path;
+    use std::io::{BufReader, BufWriter};
+    use std::fs::File;
+
+    pub struct VorbisPcmReader {
+    }
+
+    impl VorbisPcmReader {
+        pub fn new(path: &Path) -> VorbisPcmReader {
+            VorbisPcmReader {
+            }
+        }
+    }
+
+    impl PcmReader for VorbisPcmReader {
+        fn props(&mut self) -> AnyResult<Props> {
+            todo!()
+        }
+
+        fn read(
+            &mut self,
+            buf: &mut Buf,
+        ) -> AnyResult<()> {
+            todo!()
+        }
+    }
+
+    pub struct VorbisPcmWriter {
+    }
+
+    impl VorbisPcmWriter {
+        pub fn new(
+            path: &Path,
+            props: Props,
+        ) -> VorbisPcmWriter {
+            todo!()
+        }
+    }
+
+    impl PcmWriter for VorbisPcmWriter {
+        fn write(
+            &mut self,
+            buf: &Buf,
+        ) -> AnyResult<()> {
+            todo!()
+        }
+
+        fn finalize(&mut self) -> AnyResult<()> {
+            todo!()
+        }
+    }
 }
