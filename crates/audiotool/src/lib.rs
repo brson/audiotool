@@ -7,3 +7,4 @@ pub mod types;
 pub mod codecs;
 pub mod bitdepth;
 pub mod samplerate;
+pub mod testsupport;

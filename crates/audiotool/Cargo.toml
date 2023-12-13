@@ -19,3 +19,11 @@ hound = "3.5.1"
 libflac-sys = "0.3.0"
 rand_distr = "0.4.3"
 libsamplerate-sys = "0.1.12"
+
+[dev-dependencies]
+libtest-mimic = "0.6.1"
+
+[[test]]
+name = "test_convert_parameterized"
+path = "tests/test_convert_parameterized.rs"
+harness = false
