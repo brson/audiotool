@@ -1,6 +1,7 @@
 use rx::prelude::*;
 use rx::rand_pcg::Pcg64Mcg;
 use rx::rand::Rng;
+use rx::itertools::Itertools;
 use std::path::Path;
 use std::iter;
 use audiotool::convert as cvt;
@@ -143,33 +144,36 @@ struct SingleTestCase {
     outformat: Format,
 }
 
-use rx::itertools::Itertools;
-
 fn all_single_test_cases() -> impl Iterator<Item = SingleTestCase> {
-    let channels = [1, 2]; // todo
-    let codecs = [Codec::Wav, Codec::Flac, Codec::Vorbis];
-    let bit_depths = [BitDepth::F32, BitDepth::I24, BitDepth::I16];
-    let sample_rates = [SampleRate::K192, SampleRate::K48];
+    const CHANNELS: &[u16] = &[1, 2];
+    const CODECS: &[Codec] = &[Codec::Wav, Codec::Flac, Codec::Vorbis];
+    const BIT_DEPTHS: &[BitDepth] = &[BitDepth::F32, BitDepth::I24, BitDepth::I16];
+    const SAMPLE_RATES: &[SampleRate] = &[SampleRate::K192, SampleRate::K48];
 
-    let all_formats = codecs.into_iter()
-        .cartesian_product(bit_depths.into_iter())
-        .cartesian_product(sample_rates.into_iter())
+    let all_formats = || CODECS.iter().copied()
+        .cartesian_product(BIT_DEPTHS.iter().copied())
+        .cartesian_product(SAMPLE_RATES.iter().copied())
         .map(|((codec, bit_depth), sample_rate)| {
             Format {
                 codec, bit_depth, sample_rate,
             }
-        }).collect::<Vec<_>>();
+        });
 
-    let outformats = all_formats.iter().cloned();
-    let inprops = all_formats.into_iter()
-        .cartesian_product(channels.into_iter())
+    let inprops = all_formats()
+        .cartesian_product(CHANNELS.iter().copied())
         .map(|(format, channels)| {
             Props {
                 channels, format,
             }
         });
+    let outformats = all_formats();
     
-    Option::<SingleTestCase>::None.into_iter()
+    inprops.cartesian_product(outformats)
+        .map(|(inprops, outformat)| {
+            SingleTestCase {
+                inprops, outformat,
+            }
+        })
 }
 
 fn run_single_test_case(test: SingleTestCase) -> AnyResult<()> {
