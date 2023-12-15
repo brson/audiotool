@@ -276,6 +276,7 @@ pub mod flac {
             path: &Path,
             props: Props,
         ) -> FlacPcmWriter {
+            assert_eq!(props.format.codec, Codec::Flac);
             todo!()
         }
     }
@@ -333,6 +334,7 @@ pub mod vorbis {
             path: &Path,
             props: Props,
         ) -> VorbisPcmWriter {
+            assert_eq!(props.format.codec, Codec::Vorbis);
             todo!()
         }
     }
