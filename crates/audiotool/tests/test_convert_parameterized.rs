@@ -16,14 +16,19 @@ impl FormatExt for Format {
         format!(
             "{}_{}_{}",
             match self.codec {
-                _ => todo!(),
-            }
+                Codec::Wav => "wav",
+                Codec::Flac => "flac",
+                Codec::Vorbis => "vorbis",
+            },
             match self.bit_depth {
-                _ => todo!(),
-            }
+                BitDepth::F32 => "f32",
+                BitDepth::I24 => "i24",
+                BitDepth::I16 => "i16",
+            },
             match self.sample_rate {
-                _ => todo!(),
-            }
+                SampleRate::K192 => "k192",
+                SampleRate::K48 => "k48",
+            },
         )
     }
 }
