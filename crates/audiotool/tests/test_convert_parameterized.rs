@@ -10,6 +10,24 @@ use audiotool::io::{Props, Buf};
 use audiotool::codecs;
 use audiotool::testsupport::*;
 
+#[extension_trait]
+impl FormatExt for Format {
+    fn test_string(&self) -> String {
+        format!(
+            "{}_{}_{}",
+            match self.codec {
+                _ => todo!(),
+            }
+            match self.bit_depth {
+                _ => todo!(),
+            }
+            match self.sample_rate {
+                _ => todo!(),
+            }
+        )
+    }
+}
+
 fn main() {
     use libtest_mimic::{Arguments, Trial};
 
@@ -17,7 +35,20 @@ fn main() {
 
     let tests = all_single_test_cases()
         .map(|test| {
-            todo!()
+            Trial::test(
+                {
+                    format!(
+                        "{infmt}_to_{outfmt}_x{channels}",
+                        infmt = test.inprops.format.test_string(),
+                        outfmt = test.outformat.test_string(),
+                        channels = test.inprops.channels,
+                    )
+                },
+                || {
+                    run_single_test_case(test)?;
+                    Ok(())
+                },
+            )
         }).collect();
 
     libtest_mimic::run(&args, tests).exit();
