@@ -155,6 +155,8 @@ pub fn i16_to_f32(input: i16) -> f32 {
 pub fn f32_to_i16(input: f32) -> i16 {
     let i16_min = i16::MIN as f32;
     let i16_max = i16::MAX as f32;
+    debug_assert!(input >= -1.0);
+    debug_assert!(input <= 1.0);
 
     let range = i16_max - i16_min;
     //let res = (input + 1.0) / 2.0 * range + i16_min;
