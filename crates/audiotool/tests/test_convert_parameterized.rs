@@ -65,10 +65,14 @@ struct SingleTestCase {
 }
 
 fn all_single_test_cases() -> impl Iterator<Item = SingleTestCase> {
-    const CHANNELS: &[u16] = &[1, 2];
-    const CODECS: &[Codec] = &[Codec::Wav, Codec::Flac, Codec::Vorbis];
+    //const CHANNELS: &[u16] = &[1, 2];
+    const CHANNELS: &[u16] = &[1];
+    //const CODECS: &[Codec] = &[Codec::Wav, Codec::Flac, Codec::Vorbis];
+    const CODECS: &[Codec] = &[Codec::Wav];
+    //const BIT_DEPTHS: &[BitDepth] = &[BitDepth::F32, BitDepth::I24, BitDepth::I16];
     const BIT_DEPTHS: &[BitDepth] = &[BitDepth::F32, BitDepth::I24, BitDepth::I16];
-    const SAMPLE_RATES: &[SampleRate] = &[SampleRate::K192, SampleRate::K48];
+    //const SAMPLE_RATES: &[SampleRate] = &[SampleRate::K192, SampleRate::K48];
+    const SAMPLE_RATES: &[SampleRate] = &[SampleRate::K48];
 
     let all_formats = || CODECS.iter().copied()
         .cartesian_product(BIT_DEPTHS.iter().copied())

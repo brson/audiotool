@@ -57,10 +57,17 @@ impl BitDepthConverter {
                         return i;
                     }
                     BitDepth::I24 => {
-                        assert!(!self.dither);
                         let mut outbuf = self.outbuf.i24_mut();
                         outbuf.truncate(0);
-                        outbuf.extend(inbuf.iter().copied().map(f32_to_i24));
+                        if !self.dither {
+                            outbuf.extend(inbuf.iter().copied().map(f32_to_i24));
+                        } else {
+                            outbuf.extend(
+                                inbuf.iter().copied()
+                                    .map(|s| dither_f32_for_i24(s, &mut self.rng))
+                                    .map(f32_to_i24)
+                            );
+                        }
                     }
                     BitDepth::I16 => {
                         let mut outbuf = self.outbuf.i16_mut();
@@ -199,11 +206,26 @@ pub fn i24_to_i16_no_fp(input: i32) -> i16 {
 }
 
 // fixme this is just a guess
+pub fn dither_f32_for_i24(input: f32, rng: &mut impl Rng) -> f32 {
+    let i24_min = I24_MIN as f32;
+    let i24_max = I24_MAX as f32;
+    let range = i24_max - i24_min;
+
+    let scaled_int_1 = 2.0 / range;
+
+    let triangular = Triangular::new(
+        -scaled_int_1,
+        scaled_int_1,
+        0.0
+    ).expect(".");
+    let dither = triangular.sample(rng);
+    (input + dither).clamp(-1.0, 1.0)
+}
+
+// fixme this is just a guess
 pub fn dither_f32_for_i16(input: f32, rng: &mut impl Rng) -> f32 {
     let i16_min = i16::MIN as f32;
     let i16_max = i16::MAX as f32;
-    let i16_min = i16_min as f32;
-    let i16_max = i16_max as f32;
     let range = i16_max - i16_min;
 
     let scaled_int_1 = 2.0 / range;

@@ -8,6 +8,7 @@ use crate::convert as cvt;
 use crate::types::*;
 use crate::io::{Props, Buf};
 use crate::codecs;
+use crate::bitdepth::{I24_MIN, I24_MAX};
 
 pub fn write_test_file(
     path: &Path,
@@ -22,6 +23,13 @@ pub fn write_test_file(
                 iter::from_fn(|| {
                     Some(rng.gen_range(-1.0..=1.0))
                 }).take(samples).collect()
+            )
+        }
+        BitDepth::I24 => {
+            Buf::I24(
+                iter::from_fn(|| {
+                    Some(rng.gen_range(I24_MIN..=I24_MAX))
+                }).collect()
             )
         }
         _ => todo!(),

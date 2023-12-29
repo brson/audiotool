@@ -118,8 +118,9 @@ proptest! {
 
 use rx::rand_pcg::Pcg64Mcg;
 
+// fixme test i24
 #[test]
-fn dither_0() {
+fn dither_i16_0() {
     let mut rng = Pcg64Mcg::new(0);
     let buf = vec![0.0; 10000];
     let buf = buf.into_iter().map(|s| {
