@@ -74,6 +74,7 @@ fn i16_to_i24_via_f32_roundtrips() {
     do_i16_to_i24_via_f32_roundtrip(0);
     do_i16_to_i24_via_f32_roundtrip(i16::MIN);
     do_i16_to_i24_via_f32_roundtrip(i16::MAX);
+    do_i16_to_i24_via_f32_roundtrip(1092);
 }
 
 proptest! {
@@ -94,7 +95,6 @@ proptest! {
     }
 
     #[test]
-    #[ignore]
     fn i16_to_i24_via_f32_roundtrip(
         i1 in any::<i16>()
     ) {

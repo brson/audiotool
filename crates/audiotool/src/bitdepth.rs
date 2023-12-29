@@ -160,7 +160,8 @@ pub fn f32_to_i16(input: f32) -> i16 {
     //let res = (input + 1.0) / 2.0 * range + i16_min;
     let res = (input * (range / 2.0)) - 0.5;
     debug_assert!(res >= i16_min && res <= i16_max);
-    res as i16
+    // fixme unclear why rounding is required here
+    res.round() as i16
 }
 
 // fixme this is just a guess
