@@ -12,7 +12,7 @@ use audiotool::testsupport::*;
 
 #[test]
 fn basic() -> AnyResult<()> {
-    let tempdir = rx::tempfile::tempdir()?;
+    let tempdir = rx::tempfile::TempDir::with_prefix("audiotool")?;
     let config = cvt::config::Config {
         reference_tracks_dir: tempdir.path().join("in"),
         reference_track_regex: S("\\.wav$"),

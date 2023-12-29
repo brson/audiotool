@@ -32,7 +32,13 @@ pub fn write_test_file(
                 }).collect()
             )
         }
-        _ => todo!(),
+        BitDepth::I16 => {
+            Buf::I16(
+                iter::from_fn(|| {
+                    Some(rng.gen_range(i16::MIN..=i16::MAX))
+                }).collect()
+            )
+        }
     };
 
     let mut writer = codecs::writer(path, props);
