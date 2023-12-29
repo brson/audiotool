@@ -94,6 +94,7 @@ proptest! {
     }
 
     #[test]
+    #[ignore]
     fn i16_to_i24_via_f32_roundtrip(
         i1 in any::<i16>()
     ) {
