@@ -120,6 +120,7 @@ fn run_single_test_case(test: SingleTestCase) -> AnyResult<()> {
     let infile = config.reference_tracks_dir.join("test.wav");
     let outfile = config.out_root_dir.join("test.wav");
 
+    // todo parameterize
     let frames = 1024;
 
     let inbuf = write_test_file(&infile, inprops, frames)?;
@@ -139,6 +140,14 @@ fn run_single_test_case(test: SingleTestCase) -> AnyResult<()> {
 
     if inprops.format.sample_rate == outprops.format.sample_rate {
         assert_eq!(inbuf.len(), outbuf.len());
+    }
+
+    if inprops.format.sample_rate > outprops.format.sample_rate {
+        assert!(inbuf.len() > outbuf.len());
+    }
+
+    if inprops.format.sample_rate < outprops.format.sample_rate {
+        assert!(inbuf.len() < outbuf.len());
     }
 
     Ok(())
