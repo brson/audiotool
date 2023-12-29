@@ -16,8 +16,13 @@ impl BitDepthConverter {
     pub fn new(inbits: BitDepth, outbits: BitDepth, origbits: BitDepth) -> BitDepthConverter {
         let dither = match (inbits, outbits, origbits) {
             (BitDepth::F32, BitDepth::F32, BitDepth::F32) => false,
-            (BitDepth::F32, BitDepth::I24, BitDepth::F32) => false,
-            (BitDepth::F32, BitDepth::I16, BitDepth::F32) => false,
+            // For these two I content that dithering is required
+            // to e.g. eliminate a slight DC bias around the integer
+            // zero-crossing, which I think lies between 0 and -1 and
+            // is not actually representable in integer formats...
+            // This seems suspicious and I may not be understanding something.
+            (BitDepth::F32, BitDepth::I24, BitDepth::F32) => true,
+            (BitDepth::F32, BitDepth::I16, BitDepth::F32) => true,
             (BitDepth::F32, BitDepth::F32, BitDepth::I24) => false,
             (BitDepth::F32, BitDepth::I24, BitDepth::I24) => false,
             (BitDepth::F32, BitDepth::I16, BitDepth::I24) => true,

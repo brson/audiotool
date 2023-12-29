@@ -115,3 +115,30 @@ proptest! {
     }
 
 }
+
+use rx::rand_pcg::Pcg64Mcg;
+
+#[test]
+fn dither_0() {
+    let mut rng = Pcg64Mcg::new(0);
+    let buf = vec![0.0; 10000];
+    let buf = buf.into_iter().map(|s| {
+        f32_to_i16(dither_f32_for_i16(s, &mut rng))
+    }).collect::<Vec<_>>();
+
+    let mut zeros = 0;
+    let mut n_ones = 0;
+
+    for s in buf {
+        assert!(s == 0 || s == -1);
+        if s == 0 {
+            zeros += 1;
+        }
+        if s == -1 {
+            n_ones += 1;
+        }
+    }
+
+    assert!(zeros > 0);
+    assert!(n_ones > 0);
+}
