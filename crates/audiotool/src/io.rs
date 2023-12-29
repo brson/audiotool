@@ -59,6 +59,15 @@ impl Buf {
         }
     }
 
+    pub fn len(&self) -> usize {
+        match self {
+            Buf::Uninit => panic!(),
+            Buf::F32(v) => v.len(),
+            Buf::I24(v) => v.len(),
+            Buf::I16(v) => v.len(),
+        }
+    }
+
     pub fn f32_mut(&mut self) -> &mut Vec<f32> {
         match self {
             Buf::F32(buf) => buf,

@@ -59,6 +59,7 @@ fn main() {
     libtest_mimic::run(&args, tests).exit();
 }
 
+#[derive(Debug)]
 struct SingleTestCase {
     inprops: Props,
     outformat: Format,
@@ -101,6 +102,7 @@ fn all_single_test_cases() -> impl Iterator<Item = SingleTestCase> {
 }
 
 fn run_single_test_case(test: SingleTestCase) -> AnyResult<()> {
+    eprintln!("{test:#?}");
     let tempdir = rx::tempfile::TempDir::with_prefix("audiotool")?;
     let config = cvt::config::Config {
         reference_tracks_dir: tempdir.path().join("in"),
@@ -133,6 +135,10 @@ fn run_single_test_case(test: SingleTestCase) -> AnyResult<()> {
         && inprops.format.sample_rate == outprops.format.sample_rate
     {
         assert_eq!(inbuf, outbuf);
+    }
+
+    if inprops.format.sample_rate == outprops.format.sample_rate {
+        assert_eq!(inbuf.len(), outbuf.len());
     }
 
     Ok(())
