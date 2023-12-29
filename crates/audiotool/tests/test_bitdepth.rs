@@ -139,6 +139,7 @@ fn dither_0() {
         }
     }
 
-    assert!(zeros > 0);
-    assert!(n_ones > 0);
+    // fixme use real probability
+    assert!(zeros > 4900);
+    assert!(n_ones > 4900);
 }
