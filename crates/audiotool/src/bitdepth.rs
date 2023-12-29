@@ -103,12 +103,12 @@ impl BitDepthConverter {
     }
 }
 
-pub const I24_MIN: i32 = -(2 ^ 24);
-pub const I24_MAX: i32 = (2 ^ 24) - 1;
-//pub const I24_MIN: i32 = i16::MIN as _;
-//pub const I24_MAX: i32 = i16::MAX as _;
+pub const I24_MAX: i32 = (2_i32.pow(24)) - 1;
+pub const I24_MIN: i32 = -(2_i32.pow(24));
+//pub const I24_MAX: i32 = (1_i32 << 24) - 1;
+//pub const I24_MIN: i32 = -(1_i32 << 24);
 
-pub fn i24_to_f32(input: i32) -> f32 {
+pub fn i24_to_f32x(input: i32) -> f32 {
     debug_assert!(input >= I24_MIN);
     debug_assert!(input <= I24_MAX);
 
@@ -124,15 +124,51 @@ pub fn i24_to_f32(input: i32) -> f32 {
     res
 }
 
+pub fn i24_to_f32(input: i32) -> f32 {
+    debug_assert!(input >= I24_MIN);
+    debug_assert!(input <= I24_MAX);
+
+    let i24_min = I24_MIN as f64;
+    let i24_max = I24_MAX as f64;
+    let input = input as f64;
+
+    let range = i24_max - i24_min;
+
+    //let res = (input - i24_min) / range * 2.0 - 1.0;
+    let res = (input + 0.5) / (range / 2.0);
+    debug_assert!(res >= -1.0 && res <= 1.0);
+    res as f32
+}
+
 pub fn f32_to_i24(input: f32) -> i32 {
-    let i24_min = I24_MIN as f32;
-    let i24_max = I24_MAX as f32;
-    debug_assert!(input >= i24_min);
-    debug_assert!(input <= i24_max);
+    let input = input as f64;
+    let i24_min = I24_MIN as f64;
+    let i24_max = I24_MAX as f64;
+    debug_assert!(input >= -1.0);
+    debug_assert!(input <= 1.0);
 
     let range = i24_max - i24_min;
     //let res = (input + 1.0) / 2.0 * range + i24_min;
     let res = (input * (range / 2.0)) - 0.5;
+    eprintln!("{input} {res} {i24_min} {i24_max}");
+    debug_assert!(res >= i24_min as f64 && res <= i24_max as f64);
+    res.round() as i32
+}
+
+pub fn f32_to_i24x(input: f32) -> i32 {
+    let i24_min = I24_MIN as f32;
+    let i24_max = I24_MAX as f32;
+    //debug_assert!(input >= i24_min);
+    //debug_assert!(input <= i24_max);
+
+    let range = i24_max - i24_min;
+    //let res = (input + 1.0) / 2.0 * range + i24_min;
+    let mut res = (input * (range / 2.0)) - 0.5;
+    eprintln!("{res} {i24_min} {i24_max}");
+    // fixme - is this due to fp imprecision?
+    /*if res == i24_max + 1.0 {
+        res = i24_max;
+    }*/
     debug_assert!(res >= i24_min as f32 && res <= i24_max as f32);
     res as i32
 }

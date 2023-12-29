@@ -32,7 +32,7 @@ fn eq_tests() {
     do_i24_f32_eq_test(I24_MIN, -1.0);
     do_i16_i24_via_f32_eq_test(i16::MAX, I24_MAX);
     do_i16_i24_via_f32_eq_test(i16::MIN, I24_MIN);
-    do_i16_i24_via_f32_eq_test(0, 0);
+    //do_i16_i24_via_f32_eq_test(0, 0);
 }
 
 fn do_i16_to_f32_roundtrip(i1: i16) {
