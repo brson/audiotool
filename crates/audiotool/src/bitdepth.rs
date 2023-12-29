@@ -103,10 +103,10 @@ impl BitDepthConverter {
     }
 }
 
-pub const I24_MAX: i32 = (2_i32.pow(24)) - 1;
-pub const I24_MIN: i32 = -(2_i32.pow(24));
-//pub const I24_MAX: i32 = (1_i32 << 24) - 1;
-//pub const I24_MIN: i32 = -(1_i32 << 24);
+pub const I24_MAX: i32 = (2_i32.pow(23)) - 1;
+pub const I24_MIN: i32 = -(2_i32.pow(23));
+//pub const I24_MAX: i32 = (1_i32 << 23) - 1;
+//pub const I24_MIN: i32 = -(1_i32 << 23);
 
 pub fn i24_to_f32(input: i32) -> f32 {
     debug_assert!(input >= I24_MIN);
@@ -135,7 +135,7 @@ pub fn f32_to_i24(input: f32) -> i32 {
     //let res = (input + 1.0) / 2.0 * range + i24_min;
     let res = (input * (range / 2.0)) - 0.5;
     debug_assert!(res >= i24_min as f64 && res <= i24_max as f64);
-    // fixme unclear why rounding is required here
+    // fixme rounding required here or not?
     res.round() as i32
 }
 
@@ -162,6 +162,33 @@ pub fn f32_to_i16(input: f32) -> i16 {
     debug_assert!(res >= i16_min && res <= i16_max);
     // fixme unclear why rounding is required here
     res.round() as i16
+}
+
+pub fn i16_to_i24(input: i16) -> i32 {
+    f32_to_i24(i16_to_f32(input))
+}
+
+pub fn i24_to_i16(input: i32) -> i16 {
+    f32_to_i16(i24_to_f32(input))
+}
+
+// fixme doesn't produce same result as the fp conversion
+pub fn i16_to_i24_no_fp(input: i16) -> i32 {
+    if input < 0 {
+        (input as i32) << 8
+    } else {
+        let output = (input as i32) << 8;
+        output | 0xFF
+    }
+    //(input as i32) * 256
+}
+
+// todo test that this is the same as i24_to_i16
+pub fn i24_to_i16_no_fp(input: i32) -> i16 {
+    debug_assert!(input >= I24_MIN);
+    debug_assert!(input <= I24_MAX);
+
+    (input >> 8) as i16
 }
 
 // fixme this is just a guess

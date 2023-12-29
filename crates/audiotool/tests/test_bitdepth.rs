@@ -76,6 +76,20 @@ fn i16_to_i24_via_f32_roundtrips() {
     do_i16_to_i24_via_f32_roundtrip(i16::MAX);
 }
 
+fn do_i16_to_i24_vs_f32(input: i16) {
+    let i24a = i16_to_i24(input);
+    let i24b = i16_to_i24_no_fp(input);
+    eprintln!("{input:b} {i24a:b} {i24b:b}");
+    assert_eq!(i24a, i24b);
+}
+
+#[test]
+fn i16_to_i24_vs_f32() {
+    //do_i16_to_i24_vs_f32(0);
+    do_i16_to_i24_vs_f32(i16::MIN);
+    do_i16_to_i24_vs_f32(i16::MAX);
+}
+
 proptest! {
     #![proptest_config(ProptestConfig::with_cases(256 * 256))]
 
