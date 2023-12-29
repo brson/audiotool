@@ -124,8 +124,16 @@ fn run_single_test_case(test: SingleTestCase) -> AnyResult<()> {
     run_convert(config)?;
     let (outprops, outbuf) = read_file(&outfile)?;
 
-    assert_eq!(inprops, outprops);
-    assert_eq!(inbuf, outbuf);
+    assert_eq!(outprops, Props {
+        channels: inprops.channels,
+        format: test.outformat,
+    });
+
+    if inprops.format.bit_depth == outprops.format.bit_depth
+        && inprops.format.sample_rate == outprops.format.sample_rate
+    {
+        assert_eq!(inbuf, outbuf);
+    }
 
     Ok(())
 }

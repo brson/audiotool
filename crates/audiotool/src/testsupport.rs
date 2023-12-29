@@ -59,6 +59,18 @@ pub fn read_file(path: &Path) -> AnyResult<(Props, Buf)> {
                 (Buf::F32(ref mut this), Buf::F32(other)) => {
                     this.extend(other.iter());
                 },
+                (this @ Buf::Uninit, Buf::I24(other)) => {
+                    *this = Buf::I24(other.clone());
+                }
+                (Buf::I24(ref mut this), Buf::I24(other)) => {
+                    this.extend(other.iter());
+                },
+                (this @ Buf::Uninit, Buf::I16(other)) => {
+                    *this = Buf::I16(other.clone());
+                }
+                (Buf::I16(ref mut this), Buf::I16(other)) => {
+                    this.extend(other.iter());
+                },
                  _ => todo!(),
             }
         }
