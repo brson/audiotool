@@ -248,7 +248,7 @@ pub mod flac {
     use libflac_sys::*;
 
     pub struct FlacPcmReader {
-        reader: AnyResult<NonNull<FLAC__StreamDecoder>>,
+        decoder: AnyResult<NonNull<FLAC__StreamDecoder>>,
     }
 
     unsafe impl Send for FlacPcmReader { }
@@ -256,13 +256,21 @@ pub mod flac {
     impl FlacPcmReader {
         pub fn new(path: &Path) -> FlacPcmReader {
             unsafe {
-                let reader = FLAC__stream_decoder_new();
-                let reader = NonNull::new(reader);
-                let reader = reader.ok_or_else(|| {
-                    anyhow!("unable to allocate FLAC reader")
+                let decoder = FLAC__stream_decoder_new();
+                let decoder = NonNull::new(decoder);
+                let decoder = decoder.ok_or_else(|| {
+                    anyhow!("unable to allocate FLAC decoder")
                 });
+
+                let decoder = if let Ok(decoder) = decoder {
+                    FLAC__stream_decoder_set_md5_checking(decoder.as_ptr(), true as FLAC__bool);
+                    Ok(decoder)
+                } else {
+                    decoder
+                };
+
                 FlacPcmReader {
-                    reader,
+                    decoder,
                 }
             }
         }
@@ -270,7 +278,7 @@ pub mod flac {
 
     impl PcmReader for FlacPcmReader {
         fn props(&mut self) -> AnyResult<Props> {
-            let reader = self.reader.as_ref()
+            let decoder = self.decoder.as_ref()
                 .map_err(|e| anyhow!("{e}"))?;
             todo!()
         }
