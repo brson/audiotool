@@ -29,14 +29,14 @@ pub fn write_test_file(
             Buf::I24(
                 iter::from_fn(|| {
                     Some(rng.gen_range(I24_MIN..=I24_MAX))
-                }).collect()
+                }).take(samples).collect()
             )
         }
         BitDepth::I16 => {
             Buf::I16(
                 iter::from_fn(|| {
                     Some(rng.gen_range(i16::MIN..=i16::MAX))
-                }).collect()
+                }).take(samples).collect()
             )
         }
     };
