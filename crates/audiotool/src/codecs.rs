@@ -244,19 +244,34 @@ pub mod flac {
     use std::path::Path;
     use std::io::{BufReader, BufWriter};
     use std::fs::File;
+    use std::ptr::NonNull;
+    use libflac_sys::*;
 
     pub struct FlacPcmReader {
+        reader: AnyResult<NonNull<FLAC__StreamDecoder>>,
     }
+
+    unsafe impl Send for FlacPcmReader { }
 
     impl FlacPcmReader {
         pub fn new(path: &Path) -> FlacPcmReader {
-            FlacPcmReader {
+            unsafe {
+                let reader = FLAC__stream_decoder_new();
+                let reader = NonNull::new(reader);
+                let reader = reader.ok_or_else(|| {
+                    anyhow!("unable to allocate FLAC reader")
+                });
+                FlacPcmReader {
+                    reader,
+                }
             }
         }
     }
 
     impl PcmReader for FlacPcmReader {
         fn props(&mut self) -> AnyResult<Props> {
+            let reader = self.reader.as_ref()
+                .map_err(|e| anyhow!("{e}"))?;
             todo!()
         }
 
