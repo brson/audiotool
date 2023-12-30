@@ -440,6 +440,8 @@ pub mod exec {
                         sample_rate_converter.finalize()
                     };
 
+                    self.report_overs(&buf, args.0);
+
                     bit_depths.par_iter_mut().try_for_each(|args| {
                         let (
                             bit_depth,
@@ -589,6 +591,10 @@ pub mod exec {
                 }
             }
 
+        }
+
+        fn report_overs(&self, buf: &Buf, sample_rate: &SampleRate) {
+            // todo
         }
     }
 

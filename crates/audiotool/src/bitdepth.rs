@@ -138,10 +138,9 @@ pub fn i24_to_f32(input: i32) -> f32 {
 
 pub fn f32_to_i24(input: f32) -> i32 {
     let input = input as f64;
+    let input = input.clamp(-1.0, 1.0);
     let i24_min = I24_MIN as f64;
     let i24_max = I24_MAX as f64;
-    debug_assert!(input >= -1.0);
-    debug_assert!(input <= 1.0);
 
     let range = i24_max - i24_min;
     //let res = (input + 1.0) / 2.0 * range + i24_min;
@@ -165,10 +164,9 @@ pub fn i16_to_f32(input: i16) -> f32 {
 }
 
 pub fn f32_to_i16(input: f32) -> i16 {
+    let input = input.clamp(-1.0, 1.0);
     let i16_min = i16::MIN as f32;
     let i16_max = i16::MAX as f32;
-    debug_assert!(input >= -1.0);
-    debug_assert!(input <= 1.0);
 
     let range = i16_max - i16_min;
     //let res = (input + 1.0) / 2.0 * range + i16_min;
