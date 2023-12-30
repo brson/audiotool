@@ -1,13 +1,8 @@
 use rx::prelude::*;
-use rx::rand_pcg::Pcg64Mcg;
-use rx::rand::Rng;
 use rx::itertools::Itertools;
-use std::path::Path;
-use std::iter;
 use audiotool::convert as cvt;
 use audiotool::types::*;
-use audiotool::io::{Props, Buf};
-use audiotool::codecs;
+use audiotool::io::{Props};
 use audiotool::testsupport::*;
 
 #[extension_trait]
@@ -67,7 +62,7 @@ struct SingleTestCase {
 
 fn all_single_test_cases() -> impl Iterator<Item = SingleTestCase> {
     //const CHANNELS: &[u16] = &[1, 2];
-    const CHANNELS: &[u16] = &[1];
+    const CHANNELS: &[u16] = &[1, 2];
     //const CODECS: &[Codec] = &[Codec::Wav, Codec::Flac, Codec::Vorbis];
     const CODECS: &[Codec] = &[Codec::Wav];
     //const BIT_DEPTHS: &[BitDepth] = &[BitDepth::F32, BitDepth::I24, BitDepth::I16];
@@ -102,7 +97,6 @@ fn all_single_test_cases() -> impl Iterator<Item = SingleTestCase> {
 }
 
 fn run_single_test_case(test: SingleTestCase) -> AnyResult<()> {
-    eprintln!("{test:#?}");
     let tempdir = rx::tempfile::TempDir::with_prefix("audiotool")?;
     let config = cvt::config::Config {
         reference_tracks_dir: tempdir.path().join("in"),
