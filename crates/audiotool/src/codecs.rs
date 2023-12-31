@@ -249,12 +249,21 @@ pub mod flac {
 
     pub struct FlacPcmReader {
         decoder: AnyResult<NonNull<FLAC__StreamDecoder>>,
+        cbdata: *mut ReaderCallbackData,
+    }
+
+    struct ReaderCallbackData {
+        buf: Buf,
     }
 
     unsafe impl Send for FlacPcmReader { }
 
     impl FlacPcmReader {
         pub fn new(path: &Path) -> FlacPcmReader {
+            let cbdata = Box::new(ReaderCallbackData {
+                buf: Buf::Uninit,
+            });
+
             unsafe {
                 let decoder = FLAC__stream_decoder_new();
                 let decoder = NonNull::new(decoder);
@@ -284,7 +293,20 @@ pub mod flac {
 
                 FlacPcmReader {
                     decoder,
+                    cbdata: Box::leak(cbdata) as *mut ReaderCallbackData,
                 }
+            }
+        }
+    }
+
+    impl Drop for FlacPcmReader {
+        fn drop(&mut self) {
+            unsafe {
+                if let Ok(decoder) = self.decoder.as_ref() {
+                    todo!()
+                }
+
+                let _cbdata = Box::from_raw(self.cbdata);
             }
         }
     }
