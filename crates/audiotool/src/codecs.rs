@@ -264,6 +264,19 @@ pub mod flac {
 
                 let decoder = if let Ok(decoder) = decoder {
                     FLAC__stream_decoder_set_md5_checking(decoder.as_ptr(), true as FLAC__bool);
+
+                    use std::ffi::CString;
+                    let path = path.to_str().expect("todo utf8 path").to_owned();
+                    let path = CString::new(path).expect("path with nul bytes").to_owned();
+
+                    let status = FLAC__stream_decoder_init_file(
+                        decoder.as_ptr(),
+                        path.as_ptr(),
+                        todo!(),
+                        todo!(),
+                        todo!(),
+                        todo!(),                        
+                    );
                     Ok(decoder)
                 } else {
                     decoder
