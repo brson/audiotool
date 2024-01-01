@@ -334,7 +334,35 @@ pub mod flac {
 
         unsafe {
             let cbdata = &mut *(cbdata as *mut ReaderCallbackData);
-            todo!()
+
+            // Can't support properties changing between frames.
+            if let Some(props) = cbdata.props {
+                assert_eq!(
+                    props.format.sample_rate.as_u32(),
+                    (*frame).header.sample_rate,
+                );
+                match props.format.bit_depth {
+                    BitDepth::F32 => unreachable!(),
+                    BitDepth::I24 => assert_eq!(
+                        24, (*frame).header.bits_per_sample,
+                    ),
+                    BitDepth::I16 => assert_eq!(
+                        16, (*frame).header.bits_per_sample,
+                    ),
+                }
+                assert_eq!(
+                    props.channels as u32,
+                    (*frame).header.channels,
+                );
+            }
+
+            match (*frame).header.bits_per_sample {
+                24 => {
+                    let buf = cbdata.buf.i24_mut();
+                    todo!()
+                }
+                v => todo!("flac bits per sample {v}"),
+            }
         }
     }
 
@@ -356,19 +384,19 @@ pub mod flac {
                 let bit_depth = match stream_info.bits_per_sample {
                     24 => BitDepth::I24,
                     16 => BitDepth::I16,
-                    _ => todo!("flac bits per sample"),
+                    v => todo!("flac bits per sample {v}"),
                 };
 
                 let sample_rate = match stream_info.sample_rate {
                     192_000 => SampleRate::K192,
                     48_000 => SampleRate::K48,
-                    _ => todo!("flac sample rate"),
+                    v => todo!("flac sample rate {v}"),
                 };
 
                 let channels = match stream_info.channels {
                     1 => 1,
                     2 => 2,
-                    _ => todo!("flac channels"),
+                    v => todo!("flac channels {v}"),
                 };
 
                 let props = Props {
