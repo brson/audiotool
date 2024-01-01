@@ -419,17 +419,19 @@ pub mod flac {
                 .map_err(|e| anyhow!("{e}"))?;
 
             unsafe {
-                // Doing this in a block to make sure the `props`
-                // reference below is out of scope before decoding,
-                // which will mutate `props`.
-                let read_props = {
+                // Take and drop references to the shared cbdata
+                // before calling the decoder, which will mutate them.
+                {
+                    let error = &(*self.cbdata).error;
+
+                    if let Some(e) = error {
+                        bail!("{e}");
+                    }
+
                     let props = &(*self.cbdata).props;
 
-                    match props {
-                        Some(props) => return Ok(*props),
-                        None => {
-                            true
-                        }
+                    if let Some(props) = props {
+                        return Ok(*props);
                     }
                 };
 
