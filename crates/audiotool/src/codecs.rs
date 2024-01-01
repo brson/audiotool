@@ -247,6 +247,7 @@ pub mod flac {
     use std::ptr::NonNull;
     use std::ffi::{c_void, CStr};
     use libflac_sys::*;
+    use rx::libc::c_char;
 
     pub struct FlacPcmReader {
         decoder: AnyResult<NonNull<FLAC__StreamDecoder>>,
@@ -254,7 +255,7 @@ pub mod flac {
     }
 
     struct ReaderCallbackData {
-        props: Option<AnyResult<Props>>,
+        props: Option<Props>,
         buf: Buf,
     }
 
@@ -294,10 +295,7 @@ pub mod flac {
                         Ok(decoder)
                     } else {
                         FLAC__stream_decoder_delete(decoder.as_ptr());
-                        let err_cstr_ptr = FLAC__StreamDecoderInitStatusString
-                            .as_ptr().offset(status as isize);
-                        let err_cstr = CStr::from_ptr(*err_cstr_ptr);
-                        let err_str = err_cstr.to_str().expect("utf8").to_owned();
+                        let err_str = code_to_string(&FLAC__StreamDecoderInitStatusString, status);
                         Err(anyhow!("{err_str}"))
                     }
                 } else {
@@ -310,6 +308,15 @@ pub mod flac {
                 }
             }
         }
+    }
+
+    unsafe fn code_to_string(
+        table: &[*const c_char; 0],
+        code: u32,
+    ) -> String {
+        let cstr_ptr = table.as_ptr().offset(code as isize);
+        let cstr = CStr::from_ptr(*cstr_ptr);
+        cstr.to_str().expect("utf8").to_owned()
     }
 
     extern "C" fn decoder_write_callback(
@@ -340,7 +347,41 @@ pub mod flac {
 
         unsafe {
             let cbdata = &mut *(cbdata as *mut ReaderCallbackData);
-            todo!()
+
+            if (*metadata).type_ == FLAC__METADATA_TYPE_STREAMINFO {
+                let stream_info = &(*metadata).data.stream_info;
+
+                let bit_depth = match stream_info.bits_per_sample {
+                    24 => BitDepth::I24,
+                    16 => BitDepth::I16,
+                    _ => todo!("flac bits per sample"),
+                };
+
+                let sample_rate = match stream_info.sample_rate {
+                    192_000 => SampleRate::K192,
+                    48_000 => SampleRate::K48,
+                    _ => todo!("flac sample rate"),
+                };
+
+                let channels = match stream_info.channels {
+                    1 => 1,
+                    2 => 2,
+                    _ => todo!("flac channels"),
+                };
+
+                let props = Props {
+                    channels,
+                    format: Format {
+                        codec: Codec::Flac,
+                        bit_depth,
+                        sample_rate,
+                    }
+                };
+
+                assert!(cbdata.props.is_none());
+
+                cbdata.props = Some(props);
+            }
         }
     }
 
@@ -383,8 +424,7 @@ pub mod flac {
                     let props = &(*self.cbdata).props;
 
                     match props {
-                        Some(Ok(props)) => return Ok(*props),
-                        Some(Err(e)) => bail!("{e}"),
+                        Some(props) => return Ok(*props),
                         None => {
                             true
                         }
@@ -397,7 +437,9 @@ pub mod flac {
                     assert!((*self.cbdata).props.is_some());
                     self.props()
                 } else {
-                    todo!()
+                    let state = FLAC__stream_decoder_get_state(decoder.as_ptr());
+                    let err_str = code_to_string(&FLAC__StreamDecoderStateString, state);
+                    Err(anyhow!("{err_str}"))
                 }
             }
         }
