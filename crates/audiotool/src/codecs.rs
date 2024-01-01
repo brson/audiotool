@@ -254,6 +254,7 @@ pub mod flac {
     }
 
     struct ReaderCallbackData {
+        props: Option<AnyResult<Props>>,
         buf: Buf,
     }
 
@@ -262,6 +263,7 @@ pub mod flac {
     impl FlacPcmReader {
         pub fn new(path: &Path) -> FlacPcmReader {
             let mut cbdata = Box::new(ReaderCallbackData {
+                props: None,
                 buf: Buf::Uninit,
             });
 
@@ -372,7 +374,32 @@ pub mod flac {
         fn props(&mut self) -> AnyResult<Props> {
             let decoder = self.decoder.as_ref()
                 .map_err(|e| anyhow!("{e}"))?;
-            todo!()
+
+            unsafe {
+                // Doing this in a block to make sure the `props`
+                // reference below is out of scope before decoding,
+                // which will mutate `props`.
+                let read_props = {
+                    let props = &(*self.cbdata).props;
+
+                    match props {
+                        Some(Ok(props)) => return Ok(*props),
+                        Some(Err(e)) => bail!("{e}"),
+                        None => {
+                            true
+                        }
+                    }
+                };
+
+                let ok = FLAC__stream_decoder_process_until_end_of_metadata(decoder.as_ptr());
+
+                if ok != 0 {
+                    assert!((*self.cbdata).props.is_some());
+                    self.props()
+                } else {
+                    todo!()
+                }
+            }
         }
 
         fn read(
