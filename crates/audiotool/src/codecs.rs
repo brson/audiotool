@@ -283,10 +283,13 @@ pub mod flac {
                         decoder.as_ptr(),
                         path.as_ptr(),
                         Some(decoder_write_callback),
-                        todo!(),
-                        todo!(),
+                        Some(decoder_metadata_callback),
+                        Some(decoder_error_callback),
                         cbdata.as_mut() as *mut ReaderCallbackData as *mut c_void,
                     );
+
+                    todo!();
+                    
                     Ok(decoder)
                 } else {
                     decoder
@@ -306,7 +309,44 @@ pub mod flac {
         buffer: *const *const i32,
         cbdata: *mut c_void,
     ) -> FLAC__StreamDecoderWriteStatus {
-        todo!()
+        assert!(!decoder.is_null());
+        assert!(!frame.is_null());
+        assert!(!buffer.is_null());
+        assert!(!cbdata.is_null());
+
+        unsafe {
+            let cbdata = &mut *(cbdata as *mut ReaderCallbackData);
+            todo!()
+        }
+    }
+
+    extern "C" fn decoder_metadata_callback(
+        decoder: *const FLAC__StreamDecoder,
+        metadata: *const FLAC__StreamMetadata,
+        cbdata: *mut c_void,
+    ) {
+        assert!(!decoder.is_null());
+        assert!(!metadata.is_null());
+        assert!(!cbdata.is_null());
+
+        unsafe {
+            let cbdata = &mut *(cbdata as *mut ReaderCallbackData);
+            todo!()
+        }
+    }
+
+    extern "C" fn decoder_error_callback(
+        decoder: *const FLAC__StreamDecoder,
+        status: FLAC__StreamDecoderErrorStatus,
+        cbdata: *mut c_void,
+    ) {
+        assert!(!decoder.is_null());
+        assert!(!cbdata.is_null());
+
+        unsafe {
+            let cbdata = &mut *(cbdata as *mut ReaderCallbackData);
+            todo!()
+        }
     }
 
     impl Drop for FlacPcmReader {
