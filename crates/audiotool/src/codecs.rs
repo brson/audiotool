@@ -257,7 +257,7 @@ pub mod flac {
     struct ReaderCallbackData {
         props: Option<Props>,
         buf: Buf,
-        error: Option<AnyError>,
+        error: AnyResult<()>,
     }
 
     unsafe impl Send for FlacPcmReader { }
@@ -267,7 +267,7 @@ pub mod flac {
             let mut cbdata = Box::new(ReaderCallbackData {
                 props: None,
                 buf: Buf::Uninit,
-                error: None,
+                error: Ok(()),
             });
 
             unsafe {
@@ -397,7 +397,9 @@ pub mod flac {
 
         unsafe {
             let cbdata = &mut *(cbdata as *mut ReaderCallbackData);
-            todo!()
+
+            let err_str = code_to_string(&FLAC__StreamDecoderErrorStatusString, status);
+            cbdata.error = Err(anyhow!("{err_str}"));
         }
     }
 
@@ -424,7 +426,7 @@ pub mod flac {
                 {
                     let error = &(*self.cbdata).error;
 
-                    if let Some(e) = error {
+                    if let Err(e) = error {
                         bail!("{e}");
                     }
 
