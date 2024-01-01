@@ -439,14 +439,14 @@ pub mod flac {
 
                 let ok = FLAC__stream_decoder_process_until_end_of_metadata(decoder.as_ptr());
 
-                if ok != 0 {
-                    assert!((*self.cbdata).props.is_some());
-                    self.props()
-                } else {
+                if ok == 0 {
                     let state = FLAC__stream_decoder_get_state(decoder.as_ptr());
                     let err_str = code_to_string(&FLAC__StreamDecoderStateString, state);
-                    Err(anyhow!("{err_str}"))
+                    return Err(anyhow!("{err_str}"));
                 }
+
+                assert!((*self.cbdata).props.is_some());
+                self.props()
             }
         }
 
@@ -454,7 +454,43 @@ pub mod flac {
             &mut self,
             buf: &mut Buf,
         ) -> AnyResult<()> {
-            todo!()
+            let decoder = self.decoder.as_ref()
+                .map_err(|e| anyhow!("{e}"))?;
+
+            unsafe {
+                loop {
+                    // Take and drop references to the shared cbdata
+                    // before calling the decoder, which will mutate them.
+                    {
+                        let error = &(*self.cbdata).error;
+
+                        if let Err(e) = error {
+                            bail!("{e}");
+                        }
+
+                        let self_buf = &mut (*self.cbdata).buf;
+
+                        if !self_buf.is_empty() {
+                            std::mem::swap(self_buf, buf);
+                            assert!(self_buf.is_empty());
+                            return Ok(());
+                        }
+                    }
+
+                    let state = FLAC__stream_decoder_get_state(decoder.as_ptr());
+                    if state == FLAC__STREAM_DECODER_END_OF_STREAM {
+                        return Ok(());
+                    }
+                    
+                    let ok = FLAC__stream_decoder_process_single(decoder.as_ptr());
+
+                    if ok == 0 {
+                        let state = FLAC__stream_decoder_get_state(decoder.as_ptr());
+                        let err_str = code_to_string(&FLAC__StreamDecoderStateString, state);
+                        return Err(anyhow!("{err_str}"));
+                    }
+                }
+            }
         }
     }
 
