@@ -359,11 +359,33 @@ pub mod flac {
             match (*frame).header.bits_per_sample {
                 24 => {
                     let buf = cbdata.buf.i24_mut();
-                    todo!()
+
+                    // Interleave channels from individual buffers
+                    for block in 0..(*frame).header.blocksize as isize {
+                        for ch in 0..(*frame).header.channels as isize {
+                            let channel_buf = *buffer.offset(ch);
+                            let sample = *channel_buf.offset(block);
+                            buf.push(sample);
+                        }
+                    }
+                }
+                16 => {
+                    let buf = cbdata.buf.i16_mut();
+
+                    // Interleave channels from individual buffers
+                    for block in 0..(*frame).header.blocksize as isize {
+                        for ch in 0..(*frame).header.channels as isize {
+                            let channel_buf = *buffer.offset(ch);
+                            let sample = *channel_buf.offset(block);
+                            buf.push(sample as i16);
+                        }
+                    }
                 }
                 v => todo!("flac bits per sample {v}"),
             }
         }
+
+        FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE
     }
 
     extern "C" fn decoder_metadata_callback(
