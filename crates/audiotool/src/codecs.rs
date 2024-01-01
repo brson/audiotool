@@ -245,6 +245,7 @@ pub mod flac {
     use std::io::{BufReader, BufWriter};
     use std::fs::File;
     use std::ptr::NonNull;
+    use std::ffi::c_void;
     use libflac_sys::*;
 
     pub struct FlacPcmReader {
@@ -260,7 +261,7 @@ pub mod flac {
 
     impl FlacPcmReader {
         pub fn new(path: &Path) -> FlacPcmReader {
-            let cbdata = Box::new(ReaderCallbackData {
+            let mut cbdata = Box::new(ReaderCallbackData {
                 buf: Buf::Uninit,
             });
 
@@ -281,10 +282,10 @@ pub mod flac {
                     let status = FLAC__stream_decoder_init_file(
                         decoder.as_ptr(),
                         path.as_ptr(),
+                        Some(decoder_write_callback),
                         todo!(),
                         todo!(),
-                        todo!(),
-                        todo!(),                        
+                        cbdata.as_mut() as *mut ReaderCallbackData as *mut c_void,
                     );
                     Ok(decoder)
                 } else {
@@ -297,6 +298,15 @@ pub mod flac {
                 }
             }
         }
+    }
+
+    extern "C" fn decoder_write_callback(
+        decoder: *const FLAC__StreamDecoder,
+        frame: *const FLAC__Frame,
+        buffer: *const *const i32,
+        cbdata: *mut c_void,
+    ) -> FLAC__StreamDecoderWriteStatus {
+        todo!()
     }
 
     impl Drop for FlacPcmReader {
