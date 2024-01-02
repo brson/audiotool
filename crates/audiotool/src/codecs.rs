@@ -545,7 +545,10 @@ pub mod flac {
     }
 
     pub struct FlacPcmWriter {
+        encoder: AnyResult<NonNull<FLAC__StreamEncoder>>,
     }
+
+    unsafe impl Send for FlacPcmWriter { }
 
     impl FlacPcmWriter {
         pub fn new(
@@ -553,7 +556,16 @@ pub mod flac {
             props: Props,
         ) -> FlacPcmWriter {
             assert_eq!(props.format.codec, Codec::Flac);
-            todo!()
+
+            unsafe {
+                let encoder = FLAC__stream_encoder_new();
+                let encoder = NonNull::new(encoder);
+                let encoder = encoder.ok_or_else(|| {
+                    anyhow!("unable to allocate FLAC encoder")
+                });
+
+                todo!()
+            }
         }
     }
 
