@@ -646,12 +646,50 @@ pub mod flac {
             assert_eq!(buf.bit_depth(), Some(self.props.format.bit_depth));
 
             unsafe {
-                todo!()
+                let mut tmp_buf = Vec::<i32>::new();
+                let samples = match buf {
+                    Buf::Uninit => unreachable!(),
+                    Buf::F32(_) => unreachable!(),
+                    Buf::I24(buf) => &buf,
+                    Buf::I16(buf) => {
+                        tmp_buf = buf.iter().map(|s| *s as i32).collect();
+                        &tmp_buf
+                    }
+                };
+
+                let ok = FLAC__stream_encoder_process_interleaved(
+                    encoder.as_ptr(),
+                    samples.as_ptr(),
+                    samples.len() as u32,
+                ) != 0;
+
+                if ok {
+                    Ok(())
+                } else {
+                    let state = FLAC__stream_encoder_get_state(encoder.as_ptr());
+                    let err_str = code_to_string(&FLAC__StreamEncoderStateString, state);
+                    Err(anyhow!("{err_str}"))
+                }
             }
         }
 
         fn finalize(&mut self) -> AnyResult<()> {
-            todo!()
+            let encoder = self.encoder.as_ref()
+                .map_err(|e| anyhow!("{e}"))?;
+
+            unsafe {
+                let ok = FLAC__stream_encoder_finish(
+                    encoder.as_ptr(),
+                ) != 0;
+
+                if ok {
+                    Ok(())
+                } else {
+                    let state = FLAC__stream_encoder_get_state(encoder.as_ptr());
+                    let err_str = code_to_string(&FLAC__StreamEncoderStateString, state);
+                    Err(anyhow!("{err_str}"))
+                }
+            }
         }
     }
 
