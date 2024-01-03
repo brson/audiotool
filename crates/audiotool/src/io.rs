@@ -68,6 +68,15 @@ impl Buf {
         }
     }
 
+    pub fn bit_depth(&self) -> Option<BitDepth> {
+        match self {
+            Buf::Uninit => None,
+            Buf::F32(_) => Some(BitDepth::F32),
+            Buf::I24(_) => Some(BitDepth::I24),
+            Buf::I16(_) => Some(BitDepth::I16),
+        }
+    }
+
     pub fn f32_mut(&mut self) -> &mut Vec<f32> {
         match self {
             Buf::F32(buf) => buf,

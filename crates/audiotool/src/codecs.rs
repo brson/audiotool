@@ -545,6 +545,7 @@ pub mod flac {
 
     pub struct FlacPcmWriter {
         encoder: AnyResult<NonNull<FLAC__StreamEncoder>>,
+        props: Props,
     }
 
     unsafe impl Send for FlacPcmWriter { }
@@ -618,6 +619,7 @@ pub mod flac {
 
                 FlacPcmWriter {
                     encoder,
+                    props,
                 }
             }
         }
@@ -638,7 +640,14 @@ pub mod flac {
             &mut self,
             buf: &Buf,
         ) -> AnyResult<()> {
-            todo!()
+            let encoder = self.encoder.as_ref()
+                .map_err(|e| anyhow!("{e}"))?;
+
+            assert_eq!(buf.bit_depth(), Some(self.props.format.bit_depth));
+
+            unsafe {
+                todo!()
+            }
         }
 
         fn finalize(&mut self) -> AnyResult<()> {
