@@ -623,6 +623,16 @@ pub mod flac {
         }
     }
 
+    impl Drop for FlacPcmWriter {
+        fn drop(&mut self) {
+            unsafe {
+                if let Ok(encoder) = self.encoder.as_ref() {
+                    FLAC__stream_encoder_delete(encoder.as_ptr());
+                }
+            }
+        }
+    }
+
     impl PcmWriter for FlacPcmWriter {
         fn write(
             &mut self,
