@@ -246,6 +246,7 @@ pub mod flac {
     use std::fs::File;
     use std::ptr::NonNull;
     use std::ffi::{c_void, CStr};
+    use std::ffi::CString;
     use libflac_sys::*;
     use rx::libc::c_char;
 
@@ -280,7 +281,6 @@ pub mod flac {
                 let decoder = if let Ok(decoder) = decoder {
                     FLAC__stream_decoder_set_md5_checking(decoder.as_ptr(), true as FLAC__bool);
 
-                    use std::ffi::CString;
                     let path = path.to_str().expect("todo utf8 path").to_owned();
                     let path = CString::new(path).expect("path with nul bytes").to_owned();
 
@@ -310,15 +310,6 @@ pub mod flac {
                 }
             }
         }
-    }
-
-    unsafe fn code_to_string(
-        table: &[*const c_char; 0],
-        code: u32,
-    ) -> String {
-        let cstr_ptr = table.as_ptr().offset(code as isize);
-        let cstr = CStr::from_ptr(*cstr_ptr);
-        cstr.to_str().expect("utf8").to_owned()
     }
 
     extern "C" fn decoder_write_callback(
@@ -487,12 +478,16 @@ pub mod flac {
                     }
                 };
 
-                let ok = FLAC__stream_decoder_process_until_end_of_metadata(decoder.as_ptr());
+                let ok = FLAC__stream_decoder_process_until_end_of_metadata(decoder.as_ptr()) != 0;
 
-                if ok == 0 {
-                    let state = FLAC__stream_decoder_get_state(decoder.as_ptr());
-                    let err_str = code_to_string(&FLAC__StreamDecoderStateString, state);
-                    return Err(anyhow!("{err_str}"));
+                if !ok {
+                    if let Err(e) = &(*self.cbdata).error {
+                        bail!("{e}");
+                    } else {
+                        let state = FLAC__stream_decoder_get_state(decoder.as_ptr());
+                        let err_str = code_to_string(&FLAC__StreamDecoderStateString, state);
+                        return Err(anyhow!("{err_str}"));
+                    }
                 }
 
                 assert!((*self.cbdata).props.is_some());
@@ -535,9 +530,13 @@ pub mod flac {
                     let ok = FLAC__stream_decoder_process_single(decoder.as_ptr());
 
                     if ok == 0 {
-                        let state = FLAC__stream_decoder_get_state(decoder.as_ptr());
-                        let err_str = code_to_string(&FLAC__StreamDecoderStateString, state);
-                        return Err(anyhow!("{err_str}"));
+                        if let Err(e) = &(*self.cbdata).error {
+                            bail!("{e}");
+                        } else {
+                            let state = FLAC__stream_decoder_get_state(decoder.as_ptr());
+                            let err_str = code_to_string(&FLAC__StreamDecoderStateString, state);
+                            return Err(anyhow!("{err_str}"));
+                        }
                     }
                 }
             }
@@ -594,7 +593,32 @@ pub mod flac {
                     encoder
                 };
 
-                todo!()
+                let encoder = if let Ok(encoder) = encoder {
+
+                    let path = path.to_str().expect("todo utf8 path").to_owned();
+                    let path = CString::new(path).expect("path with nul bytes").to_owned();
+
+                    let status = FLAC__stream_encoder_init_file(
+                        encoder.as_ptr(),
+                        path.as_ptr(),
+                        None,
+                        std::ptr::null_mut(),
+                    );
+
+                    if status == FLAC__STREAM_ENCODER_INIT_STATUS_OK {
+                        Ok(encoder)
+                    } else {
+                        FLAC__stream_encoder_delete(encoder.as_ptr());
+                        let err_str = code_to_string(&FLAC__StreamEncoderInitStatusString, status);
+                        Err(anyhow!("{err_str}"))
+                    }
+                } else {
+                    encoder
+                };
+
+                FlacPcmWriter {
+                    encoder,
+                }
             }
         }
     }
@@ -610,6 +634,15 @@ pub mod flac {
         fn finalize(&mut self) -> AnyResult<()> {
             todo!()
         }
+    }
+
+    unsafe fn code_to_string(
+        table: &[*const c_char; 0],
+        code: u32,
+    ) -> String {
+        let cstr_ptr = table.as_ptr().offset(code as isize);
+        let cstr = CStr::from_ptr(*cstr_ptr);
+        cstr.to_str().expect("utf8").to_owned()
     }
 }
 
