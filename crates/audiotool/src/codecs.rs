@@ -587,6 +587,7 @@ pub mod flac {
                     } else {
                         let state = FLAC__stream_encoder_get_state(encoder.as_ptr());
                         let err_str = code_to_string(&FLAC__StreamEncoderStateString, state);
+                        FLAC__stream_encoder_delete(encoder.as_ptr());
                         Err(anyhow!("{err_str}"))
                     }
                 } else {
