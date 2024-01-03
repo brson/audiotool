@@ -571,15 +571,24 @@ pub mod flac {
                 };
 
                 let encoder = if let Ok(encoder) = encoder {
-	                FLAC__stream_encoder_set_verify(encoder.as_ptr(), true as FLAC__bool);
-                    // fixme
-	                FLAC__stream_encoder_set_compression_level(encoder.as_ptr(), 5);
-	                FLAC__stream_encoder_set_channels(encoder.as_ptr(), props.channels as u32);
-	                FLAC__stream_encoder_set_bits_per_sample(encoder.as_ptr(), bits_per_sample);
-	                FLAC__stream_encoder_set_sample_rate(encoder.as_ptr(), props.format.sample_rate.as_u32());
-                    // todo
-	                //FLAC__stream_encoder_set_total_samples_estimate(encoder, total_samples);
-                    Ok(encoder)
+                    let ok = {
+	                    FLAC__stream_encoder_set_verify(encoder.as_ptr(), true as FLAC__bool) != 0
+                        // fixme don't hardcode 5
+	                    && FLAC__stream_encoder_set_compression_level(encoder.as_ptr(), 5) != 0
+	                    && FLAC__stream_encoder_set_channels(encoder.as_ptr(), props.channels as u32) != 0
+	                    && FLAC__stream_encoder_set_bits_per_sample(encoder.as_ptr(), bits_per_sample) != 0
+	                    && FLAC__stream_encoder_set_sample_rate(encoder.as_ptr(), props.format.sample_rate.as_u32()) != 0
+                        // todo
+                        //FLAC__stream_encoder_set_total_samples_estimate(encoder, total_samples);
+                    };
+
+                    if ok {
+                        Ok(encoder)
+                    } else {
+                        let state = FLAC__stream_encoder_get_state(encoder.as_ptr());
+                        let err_str = code_to_string(&FLAC__StreamEncoderStateString, state);
+                        Err(anyhow!("{err_str}"))
+                    }
                 } else {
                     encoder
                 };
