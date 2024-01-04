@@ -39,7 +39,12 @@ fn test_basic(
     run_convert(config)?;
     let (outprops, outbuf) = read_file(&outfile)?;
 
-    assert_eq!(inprops, outprops);
+    let expected_outprops = Props {
+        channels: inprops.channels,
+        format: outformat,
+    };
+
+    assert_eq!(expected_outprops, outprops);
     assert_eq!(inbuf, outbuf);
 
     Ok(())
@@ -71,6 +76,25 @@ fn basic_wav_flac() -> AnyResult<()> {
             channels: 2,
             format: Format {
                 codec: Codec::Wav,
+                bit_depth: BitDepth::I24,
+                sample_rate: SampleRate::K48,
+            },
+        },
+        Format {
+            codec: Codec::Flac,
+            bit_depth: BitDepth::I24,
+            sample_rate: SampleRate::K48,
+        },
+    )
+}
+
+#[test]
+fn basic_flac_flac() -> AnyResult<()> {
+    test_basic(
+        Props {
+            channels: 2,
+            format: Format {
+                codec: Codec::Flac,
                 bit_depth: BitDepth::I24,
                 sample_rate: SampleRate::K48,
             },

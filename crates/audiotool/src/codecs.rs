@@ -502,6 +502,8 @@ pub mod flac {
             let decoder = self.decoder.as_ref()
                 .map_err(|e| anyhow!("{e}"))?;
 
+            buf.truncate();
+
             unsafe {
                 loop {
                     // Take and drop references to the shared cbdata

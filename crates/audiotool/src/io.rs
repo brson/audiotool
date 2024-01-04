@@ -106,4 +106,13 @@ impl Buf {
             }
         }
     }
+
+    pub fn truncate(&mut self) {
+        match self {
+            Buf::Uninit => { },
+            Buf::F32(buf) => buf.truncate(0),
+            Buf::I24(buf) => buf.truncate(0),
+            Buf::I16(buf) => buf.truncate(0),
+        }
+    }
 }
