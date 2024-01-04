@@ -657,10 +657,13 @@ pub mod flac {
                     }
                 };
 
+                assert_eq!(samples.len() % self.props.channels as usize, 0);
+                let samples_len = samples.len() / self.props.channels as usize;
+
                 let ok = FLAC__stream_encoder_process_interleaved(
                     encoder.as_ptr(),
                     samples.as_ptr(),
-                    samples.len() as u32,
+                    samples_len as u32,
                 ) != 0;
 
                 if ok {

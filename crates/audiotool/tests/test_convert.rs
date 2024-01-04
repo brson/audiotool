@@ -1,44 +1,37 @@
 use rx::prelude::*;
-use rx::rand_pcg::Pcg64Mcg;
-use rx::rand::Rng;
-use rx::itertools::Itertools;
-use std::path::Path;
-use std::iter;
 use audiotool::convert as cvt;
 use audiotool::types::*;
-use audiotool::io::{Props, Buf};
-use audiotool::codecs;
+use audiotool::io::Props;
 use audiotool::testsupport::*;
 
-#[test]
-fn basic() -> AnyResult<()> {
+#[extension_trait]
+impl CodecExt for Codec {
+    fn ext(&self) -> &'static str {
+        match self {
+            Codec::Wav => "wav",
+            Codec::Flac => "flac",
+            Codec::Vorbis => "ogg",
+        }
+    }
+}
+
+fn test_basic(
+    inprops: Props,
+    outformat: Format,
+) -> AnyResult<()> {
     let tempdir = rx::tempfile::TempDir::with_prefix("audiotool")?;
     let config = cvt::config::Config {
         reference_tracks_dir: tempdir.path().join("in"),
-        reference_track_regex: S("\\.wav$"),
+        reference_track_regex: format!("\\.{}$", inprops.format.codec.ext()),
         out_root_dir: tempdir.path().join("out"),
         out_path_template: S("{{out_root_dir}}/{{relative_path}}/{{file_stem}}.{{format_ext}}"),
-        formats: vec![
-            Format {
-                codec: Codec::Wav,
-                bit_depth: BitDepth::F32,
-                sample_rate: SampleRate::K48,
-            },
-        ]
+        formats: vec![outformat],
     };
 
     std::fs::create_dir_all(&config.reference_tracks_dir)?;
 
-    let inprops = Props {
-        format: Format {
-            codec: Codec::Wav,
-            bit_depth: BitDepth::F32,
-            sample_rate: SampleRate::K48,
-        },
-        channels: 2,
-    };
-    let infile = config.reference_tracks_dir.join("test.wav");
-    let outfile = config.out_root_dir.join("test.wav");
+    let infile = config.reference_tracks_dir.join(format!("test.{}", inprops.format.codec.ext()));
+    let outfile = config.out_root_dir.join(format!("test.{}", outformat.codec.ext()));
 
     let frames = 1024;
 
@@ -50,4 +43,42 @@ fn basic() -> AnyResult<()> {
     assert_eq!(inbuf, outbuf);
 
     Ok(())
+}
+
+#[test]
+fn basic_wav_wav() -> AnyResult<()> {
+    test_basic(
+        Props {
+            channels: 2,
+            format: Format {
+                codec: Codec::Wav,
+                bit_depth: BitDepth::F32,
+                sample_rate: SampleRate::K48,
+            },
+        },
+        Format {
+            codec: Codec::Wav,
+            bit_depth: BitDepth::F32,
+            sample_rate: SampleRate::K48,
+        },
+    )
+}
+
+#[test]
+fn basic_wav_flac() -> AnyResult<()> {
+    test_basic(
+        Props {
+            channels: 2,
+            format: Format {
+                codec: Codec::Wav,
+                bit_depth: BitDepth::I24,
+                sample_rate: SampleRate::K48,
+            },
+        },
+        Format {
+            codec: Codec::Flac,
+            bit_depth: BitDepth::I24,
+            sample_rate: SampleRate::K48,
+        },
+    )
 }
