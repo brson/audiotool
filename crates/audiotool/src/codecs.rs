@@ -574,9 +574,9 @@ pub mod flac {
 
                 let encoder = if let Ok(encoder) = encoder {
                     let ok = {
-	                    FLAC__stream_encoder_set_verify(encoder.as_ptr(), true as FLAC__bool) != 0
+	                    //FLAC__stream_encoder_set_verify(encoder.as_ptr(), true as FLAC__bool) != 0
                         // fixme don't hardcode 5
-	                    && FLAC__stream_encoder_set_compression_level(encoder.as_ptr(), 5) != 0
+	                    FLAC__stream_encoder_set_compression_level(encoder.as_ptr(), 5) != 0
 	                    && FLAC__stream_encoder_set_channels(encoder.as_ptr(), props.channels as u32) != 0
 	                    && FLAC__stream_encoder_set_bits_per_sample(encoder.as_ptr(), bits_per_sample) != 0
 	                    && FLAC__stream_encoder_set_sample_rate(encoder.as_ptr(), props.format.sample_rate.as_u32()) != 0
