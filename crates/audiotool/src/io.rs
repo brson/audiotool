@@ -116,3 +116,20 @@ impl Buf {
         }
     }
 }
+
+impl Props {
+    pub fn is_usable(&self) -> bool {
+        let supported_channels = &[1, 2];
+
+        if !supported_channels.contains(&self.channels) {
+            return false;
+        }
+
+        match (self.format.codec, self.format.bit_depth) {
+            (Codec::Flac, BitDepth::F32) => return false,
+            _ => { }
+        }
+
+        true
+    }
+}
