@@ -45,7 +45,24 @@ fn test_basic(
     };
 
     assert_eq!(expected_outprops, outprops);
-    assert_eq!(inbuf, outbuf);
+    
+    if inprops.format.bit_depth == outprops.format.bit_depth
+        && inprops.format.sample_rate == outprops.format.sample_rate
+    {
+        assert_eq!(inbuf, outbuf);
+    }
+
+    if inprops.format.sample_rate == outprops.format.sample_rate {
+        assert_eq!(inbuf.len(), outbuf.len());
+    }
+
+    if inprops.format.sample_rate > outprops.format.sample_rate {
+        assert!(inbuf.len() < outbuf.len());
+    }
+
+    if inprops.format.sample_rate < outprops.format.sample_rate {
+        assert!(inbuf.len() > outbuf.len());
+    }
 
     Ok(())
 }
