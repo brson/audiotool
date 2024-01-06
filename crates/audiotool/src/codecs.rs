@@ -1,6 +1,9 @@
 mod wav;
 mod flac;
 mod vorbis;
+mod opus { }
+mod aac { }
+mod alac { }
 
 use rx::prelude::*;
 use std::path::Path;
