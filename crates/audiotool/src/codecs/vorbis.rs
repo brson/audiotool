@@ -1,4 +1,4 @@
-use rx::prelude::*;
+use rmx::prelude::*;
 use crate::types::{Format, BitDepth, SampleRate, Codec};
 use crate::io::{PcmReader, PcmWriter, Buf, Props};
 use std::path::Path;

@@ -1,4 +1,4 @@
-use rx::proptest::prelude::*;
+use rmx::proptest::prelude::*;
 use audiotool::bitdepth::*;
 
 fn do_i16_f32_eq_test(i: i16, f: f32) {
@@ -116,7 +116,7 @@ proptest! {
 
 }
 
-use rx::rand_pcg::Pcg64Mcg;
+use rmx::rand_pcg::Pcg64Mcg;
 
 // fixme test i24
 #[test]

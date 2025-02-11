@@ -1,7 +1,7 @@
 use crate::types::BitDepth;
 use crate::io::Buf;
-use rx::rand::Rng;
-use rx::rand_pcg::Pcg64Mcg;
+use rmx::rand::Rng;
+use rmx::rand_pcg::Pcg64Mcg;
 use rand_distr::{Triangular, Distribution};
 
 pub struct BitDepthConverter {

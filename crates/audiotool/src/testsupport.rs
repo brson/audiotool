@@ -1,7 +1,7 @@
-use rx::prelude::*;
-use rx::rand_pcg::Pcg64Mcg;
-use rx::rand::Rng;
-use rx::itertools::Itertools;
+use rmx::prelude::*;
+use rmx::rand_pcg::Pcg64Mcg;
+use rmx::rand::Rng;
+use rmx::itertools::Itertools;
 use std::path::Path;
 use std::iter;
 use crate::types::*;
@@ -138,7 +138,7 @@ pub fn test_basic(
     inprops: Props,
     outformat: Format,
 ) -> AnyResult<()> {
-    let tempdir = rx::tempfile::TempDir::with_prefix("audiotool")?;
+    let tempdir = rmx::tempfile::TempDir::with_prefix("audiotool")?;
     let config = cvt::config::Config {
         reference_tracks_dir: tempdir.path().join("in"),
         reference_track_regex: format!("\\.{}$", inprops.format.codec.ext()),

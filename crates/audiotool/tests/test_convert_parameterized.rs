@@ -1,5 +1,5 @@
-use rx::prelude::*;
-use rx::itertools::Itertools;
+use rmx::prelude::*;
+use rmx::itertools::Itertools;
 use audiotool::types::*;
 use audiotool::io::{Props};
 use audiotool::testsupport::*;

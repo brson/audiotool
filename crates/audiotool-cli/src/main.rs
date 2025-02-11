@@ -1,5 +1,5 @@
-use rx::prelude::*;
-use rx::clap::{self, Parser as _};
+use rmx::prelude::*;
+use rmx::clap::{self, Parser as _};
 use std::path::PathBuf;
 use std::fs;
 use std::thread;
@@ -9,7 +9,7 @@ mod split;
 mod ctrlc;
 
 fn main() -> AnyResult<()> {
-    rx::extras::init();
+    rmx::extras::init();
     ctrlc::init();
 
     let cli = Cli::parse();
@@ -60,7 +60,7 @@ impl ConvertCommand {
         use audiotool::convert as cvt;
 
         let config = fs::read_to_string(&self.config)?;
-        let config: cvt::config::Config = rx::toml::from_str(&config)?;
+        let config: cvt::config::Config = rmx::toml::from_str(&config)?;
 
         let (tx, rx) = cvt::plan::spawn(config);
 
@@ -112,7 +112,7 @@ impl TemplateCommand {
         use audiotool::convert as cvt;
 
         let config = cvt::config::Config::template();
-        let config = rx::toml::to_string(&config)?;
+        let config = rmx::toml::to_string(&config)?;
 
         match &self.path {
             Some(path) => {

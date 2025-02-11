@@ -1,7 +1,7 @@
 pub mod config {
-    use rx::prelude::*;
+    use rmx::prelude::*;
     use std::path::PathBuf;
-    use rx::serde::{Serialize, Deserialize};
+    use rmx::serde::{Serialize, Deserialize};
     use crate::types::{Format, Codec, BitDepth, SampleRate};
 
     #[derive(Serialize, Deserialize)]
@@ -34,15 +34,15 @@ pub mod config {
 }
 
 pub mod plan {
-    use rx::prelude::*;
-    use rx::rayon::{self, prelude::*};
-    use rx::regex::Regex;
+    use rmx::prelude::*;
+    use rmx::rayon::{self, prelude::*};
+    use rmx::regex::Regex;
 
     use super::config::Config;
     use crate::types::Format;
     use super::OutFile;
 
-    use rx::walkdir::{self, WalkDir, DirEntry};
+    use rmx::walkdir::{self, WalkDir, DirEntry};
     use std::sync::mpsc::{SyncSender, Receiver, sync_channel, TryRecvError};
     use std::path::PathBuf;
     use std::thread;
@@ -151,10 +151,10 @@ pub mod exec {
 
     use super::plan::{Plan, InfilePlan};
 
-    use rx::prelude::*;
-    use rx::rayon::{self, prelude::*};
+    use rmx::prelude::*;
+    use rmx::rayon::{self, prelude::*};
 
-    use rx::walkdir::{self, WalkDir, DirEntry};
+    use rmx::walkdir::{self, WalkDir, DirEntry};
     use std::sync::mpsc::{SyncSender, Receiver, sync_channel};
     use std::sync::Arc;
     use std::sync::atomic::{AtomicBool, Ordering};
@@ -240,8 +240,8 @@ pub mod exec {
         plan.run();
     }
 
-    use rx::prelude::*;
-    use rx::rand::Rng;
+    use rmx::prelude::*;
+    use rmx::rand::Rng;
     use crate::types::{Format, SampleRate, BitDepth};
     use std::collections::BTreeMap;
     use crate::io::{PcmReader, PcmWriter, PanicPcmWriter, Buf, Props};
@@ -541,7 +541,7 @@ pub mod exec {
         fn do_cleanups(
             &self,
             sample_rates: ConverterPlan,
-            read_error: Result<(), Arc<rx::anyhow::Error>>,
+            read_error: Result<(), Arc<rmx::anyhow::Error>>,
         ) {
             // Do cleanups and send cancellation / file read errors.
             for (_, (_, bit_depths)) in sample_rates.into_iter() {
@@ -602,7 +602,7 @@ pub mod exec {
         let mut tmp_path = path.to_owned();
         let ext = path.extension().expect("extension");
         let ext = ext.to_string_lossy().to_string();
-        let random: u16 = rx::rand::rng().random();
+        let random: u16 = rmx::rand::rng().random();
         let ext = format!("{ext}.{random:04X}.tmp");
         tmp_path.set_extension(ext);
         tmp_path
@@ -612,9 +612,9 @@ pub mod exec {
 use crate::types::{Format, Codec};
 use self::config::Config;
 use std::path::{Path, PathBuf};
-use rx::prelude::*;
-use rx::tera::{Tera, Context as TeraContext};
-use rx::serde::Serialize;
+use rmx::prelude::*;
+use rmx::tera::{Tera, Context as TeraContext};
+use rmx::serde::Serialize;
 
 #[derive(Clone)]
 #[derive(Debug)]

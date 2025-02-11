@@ -1,4 +1,4 @@
-use rx::prelude::*;
+use rmx::prelude::*;
 use audiotool::types::*;
 use audiotool::io::Props;
 use audiotool::testsupport::*;

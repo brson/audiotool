@@ -4,7 +4,7 @@ static LOCK: Mutex<bool> = Mutex::new(true);
 static CONDVAR: Condvar = Condvar::new();
 
 pub fn init() {
-    rx::ctrlc::set_handler(ctrlc_handler).expect("ctrlc");
+    rmx::ctrlc::set_handler(ctrlc_handler).expect("ctrlc");
 }
 
 pub fn wait() {

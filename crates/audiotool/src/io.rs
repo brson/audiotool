@@ -1,4 +1,4 @@
-use rx::prelude::*;
+use rmx::prelude::*;
 use crate::types::*;
 
 #[derive(PartialEq, Debug)]

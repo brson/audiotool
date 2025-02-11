@@ -1,5 +1,5 @@
-use rx::prelude::*;
-use rx::serde::{Serialize, Deserialize};
+use rmx::prelude::*;
+use rmx::serde::{Serialize, Deserialize};
 
 pub trait SampleFormat {
     type Type;

@@ -5,7 +5,7 @@ mod opus { }
 mod aac { }
 mod alac { }
 
-use rx::prelude::*;
+use rmx::prelude::*;
 use std::path::Path;
 use crate::io::*;
 use crate::types::*;

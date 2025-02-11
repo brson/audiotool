@@ -1,4 +1,4 @@
-use rx::prelude::*;
+use rmx::prelude::*;
 use crate::types::{Format, BitDepth, SampleRate, Codec};
 use crate::io::{PcmReader, PcmWriter, Buf, Props};
 use std::path::Path;
@@ -8,7 +8,7 @@ use std::ptr::NonNull;
 use std::ffi::{c_void, CStr};
 use std::ffi::CString;
 use libflac_sys::*;
-use rx::libc::c_char;
+use rmx::libc::c_char;
 
 pub struct FlacPcmReader {
     decoder: AnyResult<NonNull<FLAC__StreamDecoder>>,

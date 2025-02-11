@@ -1,7 +1,7 @@
 use crate::types::SampleRate;
 use crate::io::Buf;
 use libsamplerate_sys::*;
-use rx::libc::{c_int, c_long};
+use rmx::libc::{c_int, c_long};
 
 pub struct SampleRateConverter {
     state: *mut SRC_STATE,

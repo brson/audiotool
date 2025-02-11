@@ -7,7 +7,7 @@ edition.workspace = true
 
 [dependencies]
 audiotool.path = "../audiotool"
-rx.workspace = true
+rmx.workspace = true
 
 [[bin]]
 name = "audiotool"
