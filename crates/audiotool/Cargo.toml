@@ -11,11 +11,9 @@ doctest = false
 
 [dependencies]
 rx.workspace = true
-rx.features = [
-]
 serde = "1"
 
-rand_distr = "0.4.3"
+rand_distr = "0.5.0"
 libsamplerate-sys = "0.1.12"
 
 # wav

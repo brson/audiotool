@@ -602,7 +602,7 @@ pub mod exec {
         let mut tmp_path = path.to_owned();
         let ext = path.extension().expect("extension");
         let ext = ext.to_string_lossy().to_string();
-        let random: u16 = rx::rand::thread_rng().gen();
+        let random: u16 = rx::rand::rng().gen();
         let ext = format!("{ext}.{random:04X}.tmp");
         tmp_path.set_extension(ext);
         tmp_path

@@ -18,11 +18,11 @@ default-members = [
 ]
 
 [workspace.dependencies]
-rx.path = "../rustx/crates/rustx"
-rx.package = "rustx"
+rx.path = "../rustmax/crates/rustmax"
+rx.package = "rustmax"
 rx.features = [
-  "rx-profile-std",
-  "rx-profile-cli",
-  "rx-feature-derive",
-  "rx-feature-serde",
+  "rmx-profile-std",
+  "rmx-profile-cli",
+  "rmx-feature-derive",
+  "rmx-feature-serde",
 ]
