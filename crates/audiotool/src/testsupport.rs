@@ -21,21 +21,21 @@ pub fn write_test_file(
         BitDepth::F32 => {
             Buf::F32(
                 iter::from_fn(|| {
-                    Some(rng.gen_range(-1.0..=1.0))
+                    Some(rng.random_range(-1.0..=1.0))
                 }).take(samples).collect()
             )
         }
         BitDepth::I24 => {
             Buf::I24(
                 iter::from_fn(|| {
-                    Some(rng.gen_range(I24_MIN..=I24_MAX))
+                    Some(rng.random_range(I24_MIN..=I24_MAX))
                 }).take(samples).collect()
             )
         }
         BitDepth::I16 => {
             Buf::I16(
                 iter::from_fn(|| {
-                    Some(rng.gen_range(i16::MIN..=i16::MAX))
+                    Some(rng.random_range(i16::MIN..=i16::MAX))
                 }).take(samples).collect()
             )
         }
