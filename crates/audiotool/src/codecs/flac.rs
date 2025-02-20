@@ -462,7 +462,9 @@ unsafe fn code_to_string(
     table: &[*const c_char; 0],
     code: u32,
 ) -> String {
-    let cstr_ptr = table.as_ptr().offset(code as isize);
-    let cstr = CStr::from_ptr(*cstr_ptr);
-    cstr.to_str().expect("utf8").to_owned()
+    unsafe {
+        let cstr_ptr = table.as_ptr().offset(code as isize);
+        let cstr = CStr::from_ptr(*cstr_ptr);
+        cstr.to_str().expect("utf8").to_owned()
+    }
 }
