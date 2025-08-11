@@ -30,10 +30,10 @@ aotuv_lancer_vorbis_sys = "0.1.4"
 opus = "0.3.0"
 
 # aac
-fdk-aac = "0.6.0"
+fdk-aac = "0.7.0"
 
 [dev-dependencies]
-libtest-mimic = "0.6.1"
+libtest-mimic = "0.8.1"
 
 [[test]]
 name = "test_convert_parameterized"

@@ -813,6 +813,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dea2df4cf52843e0452895c455a1a2cfbb842a1e7329671acf418fdc53ed4c59"
 
 [[package]]
+name = "escape8259"
+version = "0.5.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5692dd7b5a1978a5aeb0ce83b7655c58ca8efdcb79d21036ea249da95afec2c6"
+
+[[package]]
 name = "extension-trait"
 version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -842,9 +848,9 @@ dependencies = [
 
 [[package]]
 name = "fdk-aac"
-version = "0.6.0"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "82783876563cce8326c5aad3b6e95b4be4abaa913e3343e8dc2239046fc2c649"
+checksum = "30947372907d8433fe9645d3076f7f4681c3d7336c5eb7840a3c3347bcd619cf"
 dependencies = [
  "fdk-aac-sys",
 ]
@@ -1592,13 +1598,14 @@ dependencies = [
 
 [[package]]
 name = "libtest-mimic"
-version = "0.6.1"
+version = "0.8.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6d8de370f98a6cb8a4606618e53e802f93b094ddec0f96988eaec2c27e6e9ce7"
+checksum = "5297962ef19edda4ce33aaa484386e0a5b3d7f2f4e037cbeee00503ef6b29d33"
 dependencies = [
+ "anstream",
+ "anstyle",
  "clap",
- "termcolor",
- "threadpool",
+ "escape8259",
 ]
 
 [[package]]
@@ -2831,15 +2838,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
-]
-
-[[package]]
-name = "threadpool"
-version = "1.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d050e60b33d41c19108b32cea32164033a9013fe3b46cbd4457559bfbf77afaa"
-dependencies = [
- "num_cpus",
 ]
 
 [[package]]
