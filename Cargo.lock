@@ -2882,7 +2882,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.52.0",
+ "windows-sys 0.60.2",
 ]
 
 [[package]]
@@ -3250,7 +3250,7 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "webpki-root-certs",
- "windows-sys 0.52.0",
+ "windows-sys 0.61.2",
 ]
 
 [[package]]
@@ -3274,6 +3274,8 @@ dependencies = [
 [[package]]
 name = "rustmax"
 version = "0.0.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5c5e430d93947ee9097963bf4a39e993d9d110e9ae27dc24a7ebd961f6eb482e"
 dependencies = [
  "ahash",
  "anyhow",
@@ -3297,7 +3299,6 @@ dependencies = [
  "futures",
  "glob",
  "hex",
- "http",
  "hyper",
  "ignore",
  "image",
