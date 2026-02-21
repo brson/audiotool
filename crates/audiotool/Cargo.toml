@@ -1,8 +1,10 @@
 [package]
 name = "audiotool"
+description.workspace = true
 version.workspace = true
 license.workspace = true
 authors.workspace = true
+repository.workspace = true
 edition.workspace = true
 
 [lib]

@@ -1,12 +1,15 @@
 [package]
 name = "audiotool-cli"
+description = "Audio format conversion CLI"
 version.workspace = true
 license.workspace = true
 authors.workspace = true
+repository.workspace = true
 edition.workspace = true
 
 [dependencies]
 audiotool.path = "../audiotool"
+audiotool.version = "0.1.0"
 rmx.workspace = true
 
 [[bin]]
